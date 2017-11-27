@@ -1,6 +1,6 @@
 var camera, scene, renderer, controls;
-var cube, floor, axes, sphere, ring;
-var obj_active;
+var cube, floor, axes, sphere, bell, grid, line;
+var obj_active, obj;
 var rotationx = 0.0;
 var rotationy = 0.0;
 
@@ -12,7 +12,7 @@ var rotationy = 0.0;
 				scene = new THREE.Scene();
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0xffffff);
+        renderer.setClearColor(0x000000);
 				document.getElementById("canvas").appendChild( renderer.domElement );
 				controls = new THREE.OrbitControls(camera, renderer.domElement);
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -24,7 +24,9 @@ var rotationy = 0.0;
 			}
 			function animate() {
 				requestAnimationFrame( animate );
-				obj_active.rotation.x += 0.05 + rotationx;
+				if (obj != "Sphere") {
+							obj_active.rotation.x += 0.05 + rotationx;
+				}
 				obj_active.rotation.y += 0.01 + rotationy;
 				renderer.render( scene, camera );
 			}
@@ -53,50 +55,77 @@ var rotationy = 0.0;
         return axis;
       }
 
+			function addLine(){
+				var geometry = new THREE.Geometry();
+				geometry.vertices.push(
+						new THREE.Vector3(10,25,7),
+						new THREE.Vector3(110,50,0),
+						new THREE.Vector3(10,25,7));
+				var material = new THREE.LineBasicMaterial({color: 0xF6CEF5});
+				line = new THREE.Line(geometry,material);
+				scene.add(line);
+			}
+
+			function addGrid(){
+				grid = new THREE.GridHelper( 1000, 100, 0x888888, 0x888888);
+				grid.position.set(0,-0.1,0);
+				scene.add(grid);
+			}
+
+
       function addPlane(){
         var plane = new THREE.PlaneBufferGeometry(1000 , 1000, 10,10);
         var material = new THREE.MeshBasicMaterial({color:0x33FF00, side: THREE.DoubleSide});
         floor = new THREE.Mesh(plane, material);
-        floor.position.y = floor.position.y - 20;
         floor.rotation.x = Math.PI/2;
         scene.add(floor);
       }
 
       function addSphere (){
-        var material = new THREE.MeshBasicMaterial({color:0xA34242});
+				var texture = new THREE.TextureLoader().load('img/tierra.jpeg');
+				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+				texture.repeat.set(1,1);
+        //var material = new THREE.MeshBasicMaterial({color:0xA34242});
+				var material = new THREE.MeshBasicMaterial({map: texture});
         sphere = new THREE.Mesh( new THREE.SphereGeometry( 20, 20, 20 ), material );
-				sphere.position.set( 50, 0, 50 );
+				sphere.position.set( 50, 50, 50 );
         obj_active = sphere;
 				scene.add( sphere );
       }
 
       function addCube(){
+				var texture = new THREE.TextureLoader().load('img/cubemario.jpg');
         var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
-				var material = [new THREE.MeshBasicMaterial({color:0x00BB00}),
-          new THREE.MeshBasicMaterial({color:0xAA000F}),
-          new THREE.MeshBasicMaterial({color:0xCC0000}),
-          new THREE.MeshBasicMaterial({color:0xFF00CC}),
-          new THREE.MeshBasicMaterial({color:0x77FFCC}),
-          new THREE.MeshBasicMaterial({color:0x77CC00})];
+				//var material = [new THREE.MeshBasicMaterial({color:0x00BB00}),
+          //new THREE.MeshBasicMaterial({color:0xAA000F}),
+          //new THREE.MeshBasicMaterial({color:0xCC0000}),
+          //new THREE.MeshBasicMaterial({color:0xFF00CC}),
+          //new THREE.MeshBasicMaterial({color:0x77FFCC}),
+          //new THREE.MeshBasicMaterial({color:0x77CC00})];
+				var material = new THREE.MeshBasicMaterial({ map: texture});
 				cube = new THREE.Mesh( geometry, material );
-        cube.position.set( 50, 0, 50 );
+        cube.position.set( 50, 50, 50 );
         obj_active = cube;
 				scene.add(cube);
       }
 
-      function addRing(){
-        var material = new THREE.MeshBasicMaterial({color:0xA34242});
-          ring = new THREE.Mesh( new THREE.CylinderGeometry( 5, 25, 50, 40, 5 ), material );
-				  ring.position.set( 50, 25, 50 );
-          obj_active = ring;
-				  scene.add( ring );
+      function addBell(){
+				var texture = new THREE.TextureLoader().load('img/bell.jpg');
+				var material = new THREE.MeshBasicMaterial({map: texture});
+        //var material = new THREE.MeshBasicMaterial({color:0xA34242});
+          bell = new THREE.Mesh( new THREE.CylinderGeometry( 5, 25, 50, 40, 5 ), material );
+				  bell.position.set( 50, 75, 50 );
+          obj_active = bell;
+				  scene.add( bell );
       }
 
       function webGLStart (){
         init();
         addAxes();
-        addPlane();
-        addSphere();
+				addGrid();
+        //addPlane();
+        addCube();
+				addLine();
   			animate();
         var slider = document.getElementById("myRange");
         slider.oninput = function() {
@@ -107,13 +136,13 @@ var rotationy = 0.0;
       }
 
       function changeObj(){
-        var obj = document.getElementById("change").value;
+        obj = document.getElementById("change").value;
         scene.remove(obj_active);
         if (obj == "Sphere"){
           addSphere();
         } else if (obj == "Cube") {
           addCube();
         } else {
-          addRing();
+          addBell();
         }
       }
