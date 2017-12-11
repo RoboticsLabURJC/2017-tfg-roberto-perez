@@ -1,0 +1,15 @@
+{
+  "name": "Chat_Socket",
+  "version": "0.0.1",
+  "description": "Chat practica 4 app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^1.7.9",
+    "express": "^4.10.2",
+    "jquery": "^3.2.1",
+    "socket.io": "^1.7.4"
+  }
+}

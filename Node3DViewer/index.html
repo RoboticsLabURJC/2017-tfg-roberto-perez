@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Scene 3D with Electron</title>
+	<meta charset="utf-8">
+	<script src = "js/three.js"></script>
+	<script src = "js/OrbitControls.js"></script>
+	<script src = "js/object.js"></script>
+	<style>
+
+	body {
+		background-color:#000000;
+	}
+
+	.createPoint{
+		color: white;
+	}
+
+	</style>
+	</head>
+	<body onload = "webGLStart()">
+		<div>
+			<p class="createPoint">X AXIS: <input type = "number" id = "vertx"></input></p>
+			<p class="createPoint">Y AXIS: <input type = "number" id = "verty"></input></p>
+			<p class="createPoint">Z AXIS: <input type = "number" id = "vertz"></input></p>
+			<p class="createPoint">SIZE: <input type = "number" id = "size"></input></p>
+			<button onclick="createPoint()">Create</button>
+		<div>
+		  <div id="canvas" align = "center">
+		  </div>
+	</body>
+</html>
