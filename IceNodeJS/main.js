@@ -5,10 +5,10 @@ const url = require('url')
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
-
+var srv;
 var Ice = require("ice").Ice;
 var Demo = require("./Printer").Demo;
-
+var Promise;
 var ic = Ice.initialize();
 
 function createWindow () {
@@ -57,24 +57,17 @@ app.on('activate', () => {
 })
 
 ipcMain.on("async",(event,arg) =>{
-  Ice.Promise.try(
-      function()
-    {
-
-        var base = ic.stringToProxy("SimplePrinter:default -p 10000");
-        return Demo.PrinterPrx.checkedCast(base).then(
-            function(printer)
-            {
-                return printer.printString("Hello World!");
-            });
-    }
-    ).finally(
-    function()
-    {
-        if(ic)
-        {
-            console.log("Destroy");
-            //return 1;
-        }
-    }
-);});
+  if (arg == 1){
+    var proxy = ic.stringToProxy("SimplePrinter:default -p 10000");
+    Promise = Demo.PrinterPrx.checkedCast(proxy).then(
+      function(printer)
+      {
+        srv = printer;
+        console.log("TRUE");
+      });
+    } else {
+      srv.setPoint(15).then(function(data){
+      console.log(data);
+    });
+}
+});

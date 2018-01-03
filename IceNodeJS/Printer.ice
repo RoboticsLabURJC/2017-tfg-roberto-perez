@@ -2,6 +2,6 @@ module Demo
 {
     interface Printer
     {
-        void printString(string s);
+        int setPoint(int x);
     };
 };

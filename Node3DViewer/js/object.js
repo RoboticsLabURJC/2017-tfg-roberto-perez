@@ -1,8 +1,12 @@
+const electron = require("electron");
+const {ipcRenderer} = electron
+
 var camera, scene, renderer, controls;
 var  axes, grid, particles;
 var obj_active, obj;
 var rotationx = 0.0;
 var rotationy = 0.0;
+
 
 			function init() {
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -56,41 +60,34 @@ var rotationy = 0.0;
 				scene.add(grid);
 			}
 
-			function addPoint (verx,very,verz,sizep){
+			function addPoint (point){
 
 				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vector3(verx,very,verz));
+				geometry.vertices.push( new THREE.Vector3(point.x,point.y,point.z));
 				var sprite = new THREE.TextureLoader().load( "img/disc.png" );
-				var material = new THREE.PointsMaterial( { size: sizep, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
-				material.color.setHSL( 1.0, 0.3, 0.7 );
+				var material = new THREE.PointsMaterial( { size: 15, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
+				material.color.setRGB( point.r, point.g, point.b);
 				var particles = new THREE.Points( geometry, material );
+				particles.name ="point";
 				obj = "Sphere";
 				obj_active = particles;
 				scene.add( particles );
       }
 
 			function createPoint(){
-				var vertx = document.getElementById("vertx").value;
-				var verty = document.getElementById("verty").value;
-				var vertz = document.getElementById("vertz").value;
-				var size = document.getElementById("size").value;
-				if (vertx == ""){
-					vertx = 0;
+				ipcRenderer.send("async",2);
+			}
+
+			ipcRenderer.on("async-reply",(event,arg) =>{
+				addPoint(arg)
+			});
+
+			function clearAll(){
+				var selectedObject = scene.getObjectByName("point");
+				while (selectedObject != null) {
+					scene.remove(selectedObject);
+					selectedObject = scene.getObjectByName("point");
 				}
-				if (verty == ""){
-					verty = 0;
-				}
-				if (vertz == ""){
-					vertz = 0;
-				}
-				if (size == ""){
-					size = 25;
-				}
-				addPoint(vertx,verty,vertz,size);
-				document.getElementById("vertx").value = "";
-				document.getElementById("verty").value = "";
-				document.getElementById("vertz").value = "";
-				document.getElementById("size").value = "";
 			}
 
       function webGLStart (){
@@ -98,4 +95,5 @@ var rotationy = 0.0;
 				addGrid();
 				addAxes();
   			animate();
+				ipcRenderer.send("async", 1);
       }

@@ -41,7 +41,7 @@
 
     Slice.defineOperations(Demo.Printer, Demo.PrinterPrx, iceC_Demo_Printer_ids, 0,
     {
-        "printString": [, , , , , [[7]], , , , ]
+        "setPoint": [, , , , [3], [[3]], , , , ]
     });
     exports.Demo = Demo;
 }

@@ -1,0 +1,22 @@
+{
+  "name": "Node3DViewer",
+  "version": "0.1.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "common": "^0.2.5",
+    "containers": "0.0.1",
+    "datetime": "0.0.3",
+    "electron": "^1.7.9",
+    "exceptions": "^0.1.1",
+    "ice": "^3.7.0",
+    "ipc": "0.0.1",
+    "primitives": "^0.1.8",
+    "react": "^16.2.0",
+    "require": "^2.4.20",
+    "visualization": "0.0.1"
+  }
+}
