@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Based on demo found here:
+http://wiki.ros.org/roslibjs/Tutorials/BasicRosFunctionality
+http://wiki.ros.org/roslibjs/Tutorials/BasicRosFunctionality
+-->
+
+<!--
+The next two lines bring in the JavaScript files that support rosbridge integration.
+-->
+<script type="text/javascript" src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+<script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+
+<script type="text/javascript" type="text/javascript">
+
+const electron = require("electron");
+const {ipcRenderer} = electron;
+const yaml = require('js-yaml');
+const fs = require('fs');
+
+
+let config = {};
+
+try {
+    config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
+} catch (e) {
+    console.log(e);
+}
+// This function connects to the rosbridge server running on the local computer on port 9090
+var ros = new ROSLIB.Ros({
+    url : "ws://" + config.Address + ":" + config.Port
+ });
+
+ // This function is called upon the rosbridge connection event
+ ros.on('connection', function() {
+     // Write appropriate message to #feedback div when successfully connected to rosbridge
+     console.log("Connect websocket")
+ });
+
+// This function is called when there is an error attempting to connect to rosbridge
+ros.on('error', function(error) {
+    // Write appropriate message to #feedback div upon error when attempting to connect to rosbridge
+    console.log("Error to connect websocket")
+});
+
+// This function is called when the connection to rosbridge is closed
+ros.on('close', function() {
+    // Write appropriate message to #feedback div upon closing connection to rosbridge
+    console.log("Disconnect websocket");
+ });
+
+// These lines create a topic object as defined by roslibjs
+var roscam = new ROSLIB.Topic({
+    ros : ros,
+    name : config.Topic,
+    messageType : config.Msgs
+});
+
+function start() {
+roscam.subscribe(function(message){
+  console.log(message);
+});
+}
+
+function stop(){
+  roscam.unsubscribe();
+}
+
+</script>
+</head>
+
+<body>
+<div id="aplication"><h1>CameraView</h1></div>
+<button onclick="start()">Start</button>
+<button onclick = "stop()">Stop</button>
+</body>
+</html>

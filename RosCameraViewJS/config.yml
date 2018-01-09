@@ -1,0 +1,7 @@
+Server: 2 # 0 -> Deactivate, 1 -> Ice , 2 -> ROS
+Address: "localhost"
+Port: "9090"
+Format: RGB8
+Topic: "/usb_cam/image_raw"
+Name: "CameraView"
+Msgs: "sensor_msgs/Image"
