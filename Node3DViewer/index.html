@@ -5,7 +5,8 @@
 	<meta charset="utf-8">
 	<script src = "js/three.js"></script>
 	<script src = "js/OrbitControls.js"></script>
-	<script src = "js/object.js"></script>
+	<script src = "js/GUI.js"></script>
+	<script src = "js/3DViewer.js"></script>
 	<style>
 
 	body {
@@ -20,8 +21,9 @@
 	</head>
 	<body onload = "webGLStart()">
 		<div>
-			<button onclick="createPoint()">Create</button>
-			<button onclick="clearAll()">Clear All</button>
+			<button onclick="startWorker()">Start</button>
+			<button onclick="clearAll()">Restart</button>
+			<button onclick="stop()">Stop</button>
 		<div>
 		  <div id="canvas" align = "center">
 		  </div>

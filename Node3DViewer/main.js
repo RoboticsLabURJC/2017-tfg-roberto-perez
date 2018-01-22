@@ -4,17 +4,12 @@ const url = require('url')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let win;
-var srv;
-var Ice = require("ice").Ice;
-var Demo = require("./visualization").jderobot;
-var Promise;
-var ic = Ice.initialize();
-var point, color;
+let win
+
 
 function createWindow () {
   // Create the browser window.
-  win = new BrowserWindow({width: 1800, height: 1000})
+  win = new BrowserWindow({width: 800, height: 600})
 
   // and load the index.html of the app.
   win.loadURL(url.format({
@@ -22,6 +17,9 @@ function createWindow () {
     protocol: 'file:',
     slashes: true
   }))
+
+  // Open the DevTools.
+  win.webContents.openDevTools()
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -53,19 +51,3 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-ipcMain.on("async",(event,arg) =>{
-  if (arg == 1){
-    var proxy = ic.stringToProxy("SimplePrinter:default -p 10000");
-    Promise = Demo.VisualizationPrx.checkedCast(proxy).then(
-      function(printer)
-      {
-        srv = printer;
-        console.log("TRUE");
-      });
-    } else {
-      srv.drawPoint(point).then(function(data){
-        event.sender.send("async-reply",data);
-    });
-}
-});
