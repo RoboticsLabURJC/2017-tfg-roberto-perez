@@ -1,0 +1,16 @@
+{
+  "name": "CameraServer-Web",
+  "version": "0.1.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^1.7.10",
+    "js-yaml": "^3.10.0"
+  },
+  "dependencies": {
+    "express": "^4.15.2",
+    "jquery": "^3.3.1"
+  }
+}
