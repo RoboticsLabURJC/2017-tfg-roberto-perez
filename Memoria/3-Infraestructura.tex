@@ -1,18 +1,12 @@
 \chapter{Infraestructura}\label{cap.infraestructura}
-En este capitulo se describirán las tecnologías sobre las que se cimienta este trabajo. Para empezar, se detallara el funcionamiento del framework Electron, ya que todo el desarrollo de este trabajo sera compatible con él. Se profundizara en los dos middleware utilizados, ICE y ROS, y en el entorno JdeRobot.
+En este capitulo se describirán las tecnologías sobre las que se cimienta este trabajo. Para empezar, se detallara el funcionamiento del framework Electron y Node.js, ya que todo el desarrollo de este trabajo sera compatible con él. Se profundizara en los dos middleware utilizados, ICE y ROS, y en el entorno JdeRobot. Para finalizar, se describirá el API para el renderizado de gráficos WebGL, concretamente la biblioteca Three.js, y WebRTC para la conexión con los elementos multimedia.
 
-\section{El framework Electron}
-Electron \footnote{\url{https://electronjs.org/docs}}  es un framework de código abierto desarrollado por GitHub. Comenzó su desarrollo en 2013, en el mismo grupo de trabajo del editor Atom \footnote{\url{https://atom.io/}}. Concebido con la ides de permitir la creación de aplicaciones de escritorio multiplataforma con tecnologías web. Electron es la combinación de NodeJS y Chromium \footnote{\url{https://www.chromium.org/Home}} en una misma ejecución.
+\section{Node.js}
+Node.js \footnote{\url{https://nodejs.org/es/}} es un entorno multiplataforma del lado del servidor. Concebido con la intención de facilitar la creación de programas de red escalables como puede ser un servidor web, nos permite ejecutar código JavaScript fuera de un navegador y aprovechar las ventajas que nos proporciona su programación orientada a eventos. Su ejecución se lleva a cabo en un único hilo, usando entradas y salidas asíncronas que pueden ejecutarse de manera concurrente, provocando que cada una de ellas necesite de un callback para manejar los eventos. 
 
-La arquitectura de una aplicación que utiliza Electron esta formada por dos procesos: Principal y Renderizador. 
-
-El proceso principal es el encargado de generar la interfaz de usuario mediante la creación de páginas web y las administra de modo que es posible mostrar mas de una pagina web al mismo tiempo. Esta labor se realiza mediante la instancia al objeto BrowserWindow de Electron, ejecutandose una página web cada vez que se instancia. Cuando se destruye una de estas instancia, se esta cerrando esa página web. Cada aplicación con Electron debe constar de un único proceso principal, y corresponderá al script main del archivo package.json.
-
-El proceso renderizador es cada instanacia al objeto BrowserWindow y la ejecucuion de la página web correspondiente. Una aplicación con Electron puede tener multitud de procesos renderizadores, siendo cada uno independiente del resto. Cada proceso solos se preocupa de la página web que se esta ejecutando en él.
-
-Electron es totalmente compatible con NodeJS tanto en el proceso principal como en el renderizador, por lo que todas las herramientas disponibles para NodeJS, también lo están para Electron. Así mismo, es posible utilizar módulos NodeJS alojados en el repositorio de paquetes npm \footnote{\url{https://www.npmjs.com/}}. Este nos aporta un gran número de ventajas como una mayor seguridad al cargar contenido remoto, tener siempre actualizadas nuestras aplicaciones o tener un gran número de bibliotecas disponibles.
-
-Todas las aplicaciones desarrolladas en este trabajo podrán ser ejecutadas utilizando Electron, lo que nos permite utilizarlas en cualquier plataforma o, incluso, empaquetarlas usando npm o mediante un archivo Asar \footnote{\url{https://github.com/electron/asar}}
+Node.js proporciona una serie de módulos básicos que permiten realizar funciones esenciales como puede ser la programación en red asíncrona, el manejo de archivos del sistema, etc. Sin embargo, al ser de código abierto, existe una gran comunidad de desarrolladores que crean nuevos módulos para que cualquiera pueda utilizarlos. Estos módulos son fácilmente compartidos gracias al manejador de paquetes npm \footnote{\url{https://www.npmjs.com/}}, permitiéndonos compilar, instalar y manejar las dependencias de cualquier módulo de terceros que deseemos usar en nuestro proyecto.
+ 
+Por lo general un proyecto Node.js contendrá al menos dos elementos, un archivo .js que contendrá la lógica del programa escrita en JavaScript y un segundo archivo llamado Package.json que definirá nuestro programa. Este segundo archivo es donde se indican las dependencias que usara nuestro programa y nos facilitara su instalación conjunta usando el comando npm install, así como se referenciara al fichero .js indicado anteriormente.
 
 \section{El entorno ROS}
 Se trata de un Framework para el desarrollo de software robótico que ofrece las funcionalidades de un sistema operativo (abstracción del hardware, control de dispositivos de bajo nivel, mantenimiento de paquetes, etc.). ROS ofrece una serie de herramientas, bibliotecas y convenciones para simplificar la tarea de crear complejos y robustos robots. Nace con la idea de fomentar el desarrollo colaborativo, es decir que cualquier persona que realice un desarrollo puede subir a los repositorios que ofrece ROS para ello, de modo que otra persona pueda utilizarlo para usarlo en su proyecto.
@@ -75,3 +69,53 @@ Para este trabajo se va a utilizar su versión para JavaScript, sin embargo el s
 JdeRobot \footnote{\url{https://jderobot.org/Main_Page}} es el framework de software libre para el desarrollo de robótica y visión artificial creado por el grupo de robótica de la Universidad Rey Juan Carlos y licenciado bajo GPL v3 \footnote{\url{http://www.gnu.org/licenses/gpl-3.0-standalone.html}}. Su desarrollo principalmente esta realizado mediante C, C++ y Python, incorporando desarrollo en JavaScript como el tratado en este trabajo.
 
 JdeRobot esta basado en componentes que son interconectados mediante el uso de middlewares como ICE o ROS, facilitando el acceso a los dispositivos hardware. Estos componentes obtienen mediciones  de los sensores u ordenes del motor a través de llamadas a funciones locales. JdeRobot conecta esas llamadas a drivers conectados a sensores (para la recepción de las mediciones) o actuadores (para las ordenes), ya sean reales o simulados. Estas funciones locales forman la API de la capa de abstracción. La plataforma también ofrece una serie de herramientas para facilitar la teleoperación o el tratamiento de las mediciones de los sensores, y bibliotecas.
+
+\section{WebGL y Three.js}
+WebGL \footnote{\url{https://get.webgl.org/}}  es un API multiplataforma utilizada para crear gráficos 3D utilizando tecnologías web, esta basado en OpenGL y utiliza parte de su API. WebGL se ejecuta dentro del elemento HTML Canvas, o que proporciona una completa integración con la interfaz DOM. Ofrece ventajas como la compatibilidad con distintos navegadores y plataformas, no es necesario compilar para su ejecución o la interacción con otros elementos del HTML. Sin embargo, debido a que se trata de un API de bajo nivel es complejo de utilizar.
+
+Three.js \footnote{\url{https://threejs.org/}} nace como remedio a la complejidad de usar WebGL. Se trata de una biblioteca desarrollada en JavaScript que permite crear y mostrar gráficos 3D en un navegador web usando una API de alto nivel, proporcionados funciones y objetos para facilitar la creación, interacción y visualización de entornos con gráficos 3D. Utilizando secuencias de código tan simples como \textsl{object = new THREE.Mesh( new THREE.SphereBufferGeometry( 75, 20, 10 ), new THREE.MeshBasicMaterial({color:0xFF0000}))}, nos permite crear una esfera siendo la primera parte donde se define la geometría y la segunda donde se establece el material (puede ser desde un color básico como en este caso, hasta una textura obtenida desde una imagen)
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{figures/esferathreejs.png}
+		\caption{Esfera creada con la biblioteca Three.js y mostrada en un navegador}
+		\label{fig.esferathreejs}
+		\end{center}
+\end{figure}
+
+\section{WebRTC}
+WebRTC \footnote{\url{https://webrtc.org/}}  una tecnología que permite a una aplicación web capturar y transmitir audio y video, así como intercambiar datos con otros navegadores sin necesidad de intermediarios. Este intercambio se realiza de igual a igual (peer-to-peer) sin necesidad de instalaciones o softwares adicionales. WebRTC proporciona varias API y protocolos interrelacionados para dar a los navegadores y aplicaciones móviles la capacidad de intercambiar elementos multimedia en tiempo real (Real Time Communications). Esta tecnología esta soportada en los principales navegadores y tiene el soporte de Google.
+
+En este proyecto, usaremos WebRTC para la adquisición de del video obtenido a través de una cámara web. Para lograr este objetivo, se utilizara el API de WebRTC Media Stream, que nos proporcionara la descripción de los flujos de datos de audio y video, los métodos para trabajar con ellos, la conexión con los dispositivos para adquirirlos, las limitaciones asociadas a cada tipo de datos o los eventos asociados al proceso.
+
+\section{El framework Electron}
+Electron \footnote{\url{https://electronjs.org/docs}}  es un framework de código abierto desarrollado por GitHub. Comenzó su desarrollo en 2013, en el mismo grupo de trabajo del editor Atom \footnote{\url{https://atom.io/}}. Concebido con la ides de permitir la creación de aplicaciones de escritorio multiplataforma con tecnologías web. Electron es la combinación de NodeJS y Chromium \footnote{\url{https://www.chromium.org/Home}} en una misma ejecución.
+
+La arquitectura de una aplicación que utiliza Electron esta formada por dos procesos: Principal y Renderizador. 
+
+El proceso principal es el encargado de generar la interfaz de usuario mediante la creación de páginas web y las administra de modo que es posible mostrar mas de una pagina web al mismo tiempo. Esta labor se realiza mediante la instancia al objeto BrowserWindow de Electron, ejecutandose una página web cada vez que se instancia. Cuando se destruye una de estas instancia, se esta cerrando esa página web. Cada aplicación con Electron debe constar de un único proceso principal, y corresponderá al script main del archivo package.json.
+
+El proceso renderizador es cada instanacia al objeto BrowserWindow y la ejecucuion de la página web correspondiente. Una aplicación con Electron puede tener multitud de procesos renderizadores, siendo cada uno independiente del resto. Cada proceso solos se preocupa de la página web que se esta ejecutando en él.
+
+Electron es totalmente compatible con NodeJS tanto en el proceso principal como en el renderizador, por lo que todas las herramientas disponibles para Node.js, también lo están para Electron. Así mismo, es posible utilizar módulos Node.js alojados en el repositorio de paquetes npm mencionado anteriormente. Este nos aporta un gran número de ventajas como una mayor seguridad al cargar contenido remoto, tener siempre actualizadas nuestras aplicaciones o tener un gran número de bibliotecas disponibles.
+
+Todas las aplicaciones desarrolladas en este trabajo podrán ser ejecutadas utilizando Electron, lo que nos permite utilizarlas en cualquier plataforma o, incluso, empaquetarlas usando npm o mediante un archivo Asar \footnote{\url{https://github.com/electron/asar}}.
+
+Una aplicación que utiliza Electron estará formada por un archivo HTML, un fichero main.js que definirá la ventana donde se mostrara el fichero HTML y se creara la misma, y, al igual que se indica en la sección de Node.js, el archivo Package.json que definirá nuestra aplicación en Electron (nombre, versión, descripción, etc.), se indicaran las dependencias a módulos externos y el fichero main.js para que creé la aplicación. Una vez que contamos con al menos estos tres elementos, podemos instalar las dependencias mediante npm install (igual que para Node.js) y ejecutar la aplicación mediante npm start o npm test (dependerá de como hayamos definido Package.json).
+
+En la figura 3.6 se muestra el mismo HTML ejecutado con Node.js y con Electron. Como se puede apreciar, el resultado es el mismo.
+
+\begin{figure}[H]
+  \begin{center}
+    \subfigure[Node.js]{\includegraphics[width=0.4\textwidth]{figures/esferathreejs.png}}
+    \subfigure[Electron]{\includegraphics[width=0.4\textwidth]{figures/ejemploelectron.png}}
+    \caption{Ejemplo de la esfera anterior ejecutado con Node.js y con Electron}
+     \label{fig.ejemplohtmlcomm}
+     \end{center}
+\end{figure}
+
+
+
+
+
+
