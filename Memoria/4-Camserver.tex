@@ -138,12 +138,18 @@ En un primer terminal o consola se debe ejecutar el servidor intermedio de ROS e
 roslaunch rosbridge_server rosbridge_websocket.launch
 \end{lstlisting}
 El segundo terminal será donde lanzamos el driver, por lo que tenemos dos formas de hacerlo:
+\begin{itemize}
+\item 
 Con Node.js
+\end{itemize}
 \begin{lstlisting}[frame=single]
 node run.js
 Arrancamos nuestro navegador favorito y ponemos la url http://localhost:7777/
 \end{lstlisting}
+\begin{itemize}
+\item 
 Con Electron
+\end{itemize}
 \begin{lstlisting}[frame=single]
 npm install
 npm start
