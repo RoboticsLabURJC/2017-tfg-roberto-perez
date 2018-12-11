@@ -1,6 +1,6 @@
-
 var camera, scene, renderer, controls;
 var  axes, grid, particles;
+var id_list = ["points","line"];
 var rotationx = 0.0;
 var rotationy = 0.0;
 var toDegrees = 180/Math.PI;
@@ -54,19 +54,17 @@ var toDegrees = 180/Math.PI;
 				scene.add( particles );
 			}
 
-			function addLine(segment,name){
+
+			function addLine(segment){
 				var geometry = new THREE.Geometry();
 				geometry.vertices.push(
 						new THREE.Vector3(segment.seg.fromPoint.x,segment.seg.fromPoint.z,segment.seg.fromPoint.y),
-						new THREE.Vector3(segment.seg.toPoint.x,segment.seg.toPoint.z,segment.seg.toPoint.y),
-						new THREE.Vector3(segment.seg.fromPoint.x,segment.seg.fromPoint.z,segment.seg.fromPoint.y));
+						new THREE.Vector3(segment.seg.toPoint.x,segment.seg.toPoint.z,segment.seg.toPoint.y));
 				var material = new THREE.LineBasicMaterial();
 				material.color.setRGB(segment.c.r,segment.c.g, segment.c.b);
-				if (name != "plane"){
-					material.linewidth = config.linewidth;
-				}
+				material.linewidth = config.linewidth;
 				line = new THREE.Line(geometry,material);
-				line.name = name;
+				line.name = "line";
 				scene.add(line);
 			}
 
@@ -76,15 +74,17 @@ var toDegrees = 180/Math.PI;
 				scene.add(grid);
 			}
 
-			function deleteObj(name){
-				var selectedObject = scene.getObjectByName(name);
-				while (selectedObject != null) {
-					scene.remove(selectedObject);
-					selectedObject = scene.getObjectByName(name);
+			function deleteObj(){
+				for (i = 0; i < id_list.length; i++){
+					var selectedObject = scene.getObjectByName(id_list[i]);
+					while (selectedObject != null) {
+						scene.remove(selectedObject);
+						selectedObject = scene.getObjectByName(id_list[i]);
+					}
 				}
 			}
 
-			function addObj(obj){
+			function addObj(obj,pos){
 				var type = obj.obj.split(":");
 				if (type[0] == "https" ){
 					var url = obj.obj
@@ -92,36 +92,28 @@ var toDegrees = 180/Math.PI;
 					var file = new Blob([obj.obj], {type:'text/plain'});
 					var url  = window.URL.createObjectURL(file);
 				}
-				if (obj.format == "obj"){
-					loadObj(url, obj)
-				} else if (obj.format == "dae") {
-					loadDae(url,obj);
+				loadModel(url,obj,pos);
+			}
+
+			function loadModel(url,obj,pose3d){
+				if (obj.format == "dae") {
+					var loader = new THREE.ColladaLoader();
+				} else if (obj.format == "obj") {
+					var loader = new THREE.OBJLoader();
+				} else {
+					alert("Format not support");
+					return;
 				}
-			}
-
-			function loadDae (url,obj){
-				var loader = new THREE.ColladaLoader();
-				loader.load(url, function (collada) {
-					var avatar = collada.scene;
-					avatar.name = obj.id;
-					scene.add( avatar );
+				var scale = obj.scale;
+				loader.load(url, function (object) {
+					if (obj.format == "dae") object = object.scene;
+					object.name = obj.id;
+					id_list.push(obj.id);
+					object.position.set(pose3d.x,pose3d.y,pose3d.z);
+					object.rotation.set(pose3d.rx*toDegrees,pose3d.ry * toDegrees, pose3d.rz * toDegrees);
+					object.scale.set(scale,scale,scale);
+					scene.add( object );
 				} );
-			}
-
-			function loadObj(url,obj){
-				var loader = new THREE.OBJLoader();
-				loader.load(
-					url,
-					function(object){
-						object.name = obj.id;
-						scene.add(object);
-					},
-					function (xhr){
-					},
-					function (error){
-						console.log(error);
-					}
-				);
 			}
 
 			function moveObj(pose3d){
@@ -130,9 +122,10 @@ var toDegrees = 180/Math.PI;
 				selectedObject.rotation.set(pose3d.rx*toDegrees,pose3d.ry * toDegrees, pose3d.rz * toDegrees);
 			}
 
+
       function webGLStart (){
         init();
-				//addGrid();
-  			animate();
+				addGrid();
+				animate();
 				startWorker();
       }

@@ -46,7 +46,6 @@ function setLine(){
 
 function setObj(id){
   srv.getObj3D(id).then(function(data){
-    console.log(data);
     self.postMessage({func:"drawObj", obj: data});
   })
 }
