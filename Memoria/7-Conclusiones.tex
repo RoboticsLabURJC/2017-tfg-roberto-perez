@@ -1,1 +1,32 @@
 \chapter{Conclusiones}\label{cap.conclusiones}
+
+Una vez se ha detallado la conversión de los visores para su utilización con Electron y ROS, se ha explicado como se ha elaborado el nuevo visor de elementos 3D y se ha elaborado un nuevo driver para complementar los drivers para fuentes de video ya existentes en la plataforma JdeRobot, ha llegado el momento de analizar el trabajo realizado y verificar si se han cumplido los objetivos marcados.
+
+\section{Conclusiones}
+Dado que el primer y principal objetivo marcado en este trabajo era enriquecer las herramientas existentes en la plataforma JdeRobot con nuevas herramientas con tecnologías web, se puede concluir que se ha alcanzado el objetivo satisfactoriamente, aportando dos nuevas herramientas y ampliando los tres visores web ya existentes. Pero vamos a centrarnos en los subobjetivos marcados en el capitulo 2.
+
+El primer subobjetivo marcado era el de modificar los tres visores web existentes en la plataforma JdeRobot para que pudieran ser usados tanto en el navegador como con Electron y, a su vez, que pudieran conectarse mediante los middleware ICE y ROS. Esta meta se ha alcanzado de manera satisfactoria, teniendo ahora nuevas versiones de los visores llamadas ``CamVizWeb'', ``TurtlebotVizWeb'' y ``DroneVizWeb''. 
+
+La segunda meta marcada era la de crear un nuevo visor 3D con tecnologías web que pudiera sustituir al visor existente en la plataforma JdeRobot desarrollado en C++, utilizado en la práctica de JdeRobot Academy de reconstrucción 3D. Este subobjetivo se ha alcanzado con la herramienta web ``3DVizWeb'', y no solo hasta el punto que se había marcado, sino que viendo su funcionamiento, se decidió ampliar el visor para que pudiera mostrar no solo puntos como el visor anterior, sino, también segmentos y objetos 3D. Sin embargo, no ha sido posible imitar el funcionamiento del visor anterior, ya que el nuevo visor 3D es el encargado de llevar la iniciativa y debe ser el que solicite los elementos al servidor, y no que los reciba sin más como funcionaba anteriormente.
+
+La última meta fijada era la de crear un componente que pudiera obtener y enviar las imágenes obtenidas de una fuente de video, complementando a los componentes cameraserver y cameraserver\_py de JdeRobot que realizan la misma función pero desarrollados con C++ y Python respectivamente. Este subobjetivo se ha alcanzado con el componente ``camServerWeb'' que adquiere las imágenes de las cámaras web conectadas y las transmite mediante ROS a los diferentes clientes.
+
+Analizando todo lo realizado y tras probar su eficiencia mediante las experimentaciones, se puede concluir que se ha enriquecido la plataforma JdeRobot, que hasta ahora su desarrollo principal era con C++ y Python, con tecnologías web. Además, se han proporcionado una herramienta muy útil como es ``3DVizWeb'' para que otros desarrolladores e investigadores puedan representar escenas adquiridas mediante sensores en un mundo tridimensional.
+
+Finalmente, a título personal, he ampliado mis capacidades con tecnologías web y aprendido el uso del framework Electron que es muy útil para elaborar aplicaciones de escritorio pero programadas como si fueran web. He conocido el mundo de la robótica y como mediante middlewares como ICE o ROS es posible conectar sensores o actuadores a una aplicación para compartir información entre ambos.
+
+\section{Trabajos Futuros}
+Pese a todo lo logrado en el presente trabajo, se han quedado varios temas pendientes que no han sido posible solucionar antes del final. A continuación se indican los trabajos pendientes que se esperan solventar en un futuro:
+
+\begin{itemize}
+\item El primer problema a solventar es permitir que la herramienta ``CamVizWeb'' muestre imágenes en crudo de ROS y no solo imágenes comprimidas como ahora. Esta mejora, permitiría conectar este visor al resto de driver de transmisión de fuemtes de video.
+\item El segundo trabajo a realizar es conseguir que ``3DVizWeb'' pueda recibir los elementos sin ser necesario que haya realizado la petición previamente, de modo que la iniciativa la lleve el servidor de los elementos y no el visor. Este hecho permitirá que pueda conectarse al visor más de un servidor de elementos simultáneamente, además reducirá el retardo del visor al reducir a la mitad el intercambio de mensajes.
+\item Posibilitar la ejecución de ``3DVizWeb'' con el navegador, implementando una posibilidad de configurar la herramienta, que hasta ahora solo es posible mediante un fichero de configuración ``YAML'' que cuando se ejecuta desde el navegador no es capaz de abrir.
+\item También se intentará añadir la posibilidad de realizar las conexiones e intercambio de mensajes con el middleware ROS, de modo que todas las herramientas web puedan conectarse tanto con ICE como con ROS.
+\item En relación al primer trabajo indicado, también es necesario incluir en el componente ``camServerWeb'' la posibilidad de transmitir imágenes crudas de ROS y no solo imágenes comprimidas. Adicionalmente, un trabajo no marcado pero que sería interesante, es añadir el envío mediante el middleware ICE y no solo con ROS.
+\item Empaquetar las herramientas web mediante paquetes npm, de modo que permita a otros usuarios descargar e instalar fácil y rápidamente las herramientas para ser usadas. Se ha experimentado con la creación de estos paquetes pero los resultados que se han obtenido no han sido satisfactorios por completo.
+\end{itemize}
+
+Por último, una vez solventados estos problemas, la intención es seguir ampliando la plataforma JdeRobot con tecnología web, creando nuevas herramientas y componentes.
+
+
