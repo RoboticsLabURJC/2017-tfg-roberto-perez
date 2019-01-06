@@ -1,4 +1,4 @@
-\chapter{Visor web de componentes 3D}\label{cap.visor3d}
+\chapter{Visor web dinámico de objetos 3D}\label{cap.visor3d}
 En este capítulo se va a tratar la creación de un nuevo visor de elementos 3D (modelos, puntos y rectas) con tecnologías web. Este visor, al que se ha nombrado como 3DVizWeb, nos abrirá la posibilidad de obtener datos por una cámara o sensor y mostrar una representación 3D de los mismos.
 \section{Diseño}
 Este visor está elaborado usando JavaScript y HTML como lenguajes de programación, y se usará el middleware ICE para la interconexión con los clientes que nos enviaran los datos a mostrar. A continuación se muestra una imagen con el diseño del visor 3D:
@@ -15,6 +15,7 @@ La herramienta esta dividida en dos partes: la interfaz gráfica y las conexione
 La parte correspondiente a la interfaz gráfica será la que da origen a nuestro visor y cómo se definen cada uno de los tipos de objetos que es capaz de mostrar, para que la interfaz sea capaz de mostrar todos los objetos recibidos desde el servidor.
 
 Las conexiones ICE con el servidor incluyen a su vez varias partes claramente sementadas. Estas partes corresponden a la petición y recepción de cada tipo de elemento al servidor, haciendo especial hincapié a los objetos 3D que contarán con las peticiones y recepciones para mostrar nuevos objetos y otras peticiones y recepciones de movimiento de los objetos 3D que ya se están mostrando.
+
 \section{Configuración}
 En este apartado se va a explicar el método utilizado para configurar el visor 3D. Dado que el visor en su interfaz gráfica únicamente muestra la escena donde se mostrará los objetos como se explicará en la siguiente sección, es necesario utilizar una alternativa para configurar los datos de conexión (ip y puerto de escucha) y otros parámetros configurables (posición inicial de la cámara, tamaño de los puntos, tamaño de los segmentos y periodo de tiempo entre peticiones de cada tipo de objeto) antes de arrancar el visor.
 Se ha decidido usar un archivo externo con formato ``YAML'' que será leído y cargada la información por el visor al arrancar. ``YAML'' es un formato de serialización de datos muy sencillo de usar y de leer por una aplicación. Usando una única línea de código, somos capaces de cargar y guardar en una variable la información que contiene un archivo de este tipo. Para cargarlo en el visor, vamos a usar el siguiente código:
@@ -37,274 +38,6 @@ Los parámetros que podrán ser configurados en el visor serán los siguientes:
 \item Tamaño de los puntos en pixeles. Por defecto serán 8 pixeles.
 \item Posición inicial de la cámara. Estará formada por ``x'', otra ``y'' y ``z'', siendo por defecto ``50'', ``20'' y ``100'' respectivamente.
 \end{itemize}
-
-\section{Mensajes}
-En esta sección se describirá la estructura de los mensajes para cada tipo y como se definen utilizando el lenguaje de descripción Slice, explicado en el capitulo 3 de esta memoria.
-\subsection{Estructura del mensaje para visualizar los puntos}
-Para representar un punto, como veremos en la siguiente sección, únicamente necesitamos una posición en el eje de coordenadas y el color que tendrá el punto. Teniendo en cuenta esto, la estructura del mensaje sería muy simple:
-\begin{itemize}
-\item Coordenada ``X''
-\item Coordenada ``Y''
-\item Coordenada ``Z''
-\item Componente de color ``R'' (valor decimal entre 0 y 1)
-\item Componente de color ``G'' (valor decimal entre 0 y 1)
-\item Componente de color ``B'' (valor decimal entre 0 y 1)
-\end{itemize}
-Sin embargo, como se ha explicado anteriormente, el visor tiene la iniciativa y solicitará si hay nuevos puntos que mostrar cada cierto periodo de tiempo. Dado que puede interesar que este periodo sea largo para evitar constantes peticiones y mayor carga de trabajo, se ha decidido que no solo se pueda enviar un punto en cada petición, sino que se pueda enviar un buffer de puntos. La estructura del mensaje por tanto no será una posición en el eje de coordenadas y el color, sino una colección variable de estos elementos (podrá ser uno o más).
-Finalmente, para dar la posibilidad al servidor de indicar si desea añadir o eliminar lo que se muestra en ese momento en el visor (refrescar la escena que muestra el visor), al mensaje se le añade un booleano que valga True, si se desea eliminar lo que se muestra en ese momento y únicamente que se visualice lo que se transmite en ese mensaje, o False, si lo que se desea es añadir lo transmitido en este mensaje a lo que ya se muestra.
-Por tanto nuestro mensaje quedará como sigue:
-\begin{itemize}
-\item Buffer de puntos con los siguientes parámetros:
-	\begin{itemize}
-	\item Coordenada ``X''
-	\item Coordenada ``Y''
-	\item Coordenada ``Z''
-	\item Componente de color ``R'' (valor decimal entre 0 y 1)
-	\item Componente de color ``G'' (valor decimal entre 0 y 1)
-	\item Componente de color ``B'' (valor decimal entre 0 y 1)
-	\end{itemize}
-\item Refresco del visor
-\end{itemize}
-
-\subsection{Estructura del mensaje para visualizar segmentos}
-Como se verá en la siguiente sección, para visualizar un segmento únicamente es necesario enviar la posición en el eje de coordenadas de dos puntos y el color con el que se desea visualizar el segmento. Por tanto, la estructura del mensaje para representar un segmento será la siguiente:
-\begin{itemize}
-\item Punto de inicio
-	\begin{itemize}
-		\item Coordenada ``X''
-		\item Coordenada ``Y''
-		\item Coordenada ``Z''
-	\end{itemize}
-\item Punto de fin
-	\begin{itemize}
-		\item Coordenada ``X''
-		\item Coordenada ``Y''
-		\item Coordenada ``Z''
-	\end{itemize}
-\item Componente de color ``R'' (valor decimal entre 0 y 1)
-\item Componente de color ``G'' (valor decimal entre 0 y 1)
-\item Componente de color ``B'' (valor decimal entre 0 y 1)
-\end{itemize}
-Sin embargo, al igual que para el caso de los puntos, se desea poder enviar varios segmentos. El mensaje, por tanto, contendrá un buffer de segmentos cuya estructura será una colección de dos puntos, con su posición en el eje de coordenadas, y el color de cada segmento.
-Finalmente, también se incluye el booleano para indicar si se debe refrescar el visor o por el contrario simplemente se deben añadir a lo que ya se muestra.
-La estructura final del mensaje de envío de segmentos será la siguiente:
-\begin{itemize}
-	\item Buffer de segmentos
-	\begin{itemize}
-		\item Punto de inicio
-		\begin{itemize}
-			\item Coordenada ``X''
-			\item Coordenada ``Y''
-			\item Coordenada ``Z''
-		\end{itemize}
-		\item Punto de fin
-		\begin{itemize}
-			\item Coordenada ``X''
-			\item Coordenada ``Y''
-			\item Coordenada ``Z''
-		\end{itemize}
-		\item Componente de color ``R'' (valor decimal entre 0 y 1)
-		\item Componente de color ``G'' (valor decimal entre 0 y 1)
-		\item Componente de color ``B'' (valor decimal entre 0 y 1)
-	\end{itemize}
-	\item Refresco del visor
-\end{itemize}
-
-\subsection{Estructura del mensaje para visualizar un modelo 3D}
-En este caso, primero hay que indicar que el mensaje de petición es algo diferente a los casos anteriores. Mientras que para los segmentos y para los puntos únicamente se hace la petición sin añadir ningún parámetro a la misma (la forma de realizar la petición se detallará en secciones posteriores), en el caso de las peticiones de un modelo 3D desde el visor 3D al servidor, se le debe incluir el identificador que se le va a dar al modelo (en caso de que el servidor tenga uno para enviar), de modo que tanto visor como servidor puedan relacionar las peticiones de movimiento o borrado de un modelo mediante este identificador.
-Una vez explicado esto, ya podemos ver cómo es la estructura del mensaje para visualizar un modelo 3D. Para mostrar un modelo, se necesita conoces el archivo que contiene el modelo, el formato del archivo, la posición en el eje de coordenadas, la orientación del modelo y la escala del modelo. 
-
-El archivo puede ser enviado de dos formas, la primera forma es mediante una url a un servidor externo o página web, la segunda forma es enviar el fichero como texto plano, sin embargo esta segunda vía tiene el inconveniente de que no pueden ser enviados archivos de más de 1 MB de tamaño, por lo que si se quiere enviar un archivo más grande, debe realizarse mediante url.
-
-El formato del archivo, como se explicará en próximas secciones, puede ser del tipo ``dae'' o ``obj''. Estos dos formatos son los más utilizados a la hora de crear modelos 3D y por tanto se considerá que dando soporte a los dos formatos permite usar cualquier modelo que se desee.
-
-La escala del modelo será un número decimal que indicará el tamaño con el que se desea mostrar el modelo, permitiendo así mostrar varias veces el mismo modelo pero cambiando de tamaño (por ejemplo, podemos querer mostrar un brazo humano en diferentes tamaños para representar a un niño y a un adulto).
-
-Por último, tanto para la posición como para la orientación se usará la clase ``Pose3D''. Esta clase esta formada por las coordenadas ``X'', ``Y'' y ``Z'', una componente ``h'' que no se utilizara, y los cuaterniones ``q0'', ``q1'', ``q2'' y ``q3'' para después usando las formulas matemáticas correspondientes y que se explicaran más adelante, nos proporciona la orientación del objeto.
-
-Por tanto, el formato del mensaje tendrá la siguiente estructura:
-\begin{itemize}
-	\item Archivo con el modelo 3D
-	\item Formato del archivo
-	\item	Pose3D
-	\begin{itemize}
-		\item Coordenada ``X''
-		\item Coordenada ``Y''
-		\item Coordenada ``Z''
-		\item ``h''
-		\item Cuaternión ``q0''
-		\item Cuaternión ``q1''
-		\item Cuaternión ``q2''
-		\item Cuaternión ``q3''
-	\end{itemize}
-	\item Escala
-	\item Identificador
-	\item Refresco del visor
-\end{itemize}
-Como se puede ver, se vuelve a enviar el identificador que había sido previamente transmitido por el visor, y se añade también el refresco al igual que para los puntos y los segmentos. Sin embargo, debido a las limitaciones de tamaño de los archivos que se pueden enviar mediante ICE, y la necesidad de establecer un identificador común, solo es posible enviar un modelo 3D por petición realizada y no un buffer de modelos, como si podemos hacer con los puntos y los segmentos.
-
-\subsection{Estructura del mensaje para mover los objetos 3D}
-Como se explicará en secciones sucesivas, los objetos 3D que se visualizan probablemente se deseen moverlos de posición u orientación y borrarlos y crearlos de nuevo implica un mayor retardo y carga de trabajo, por lo que ha sido necesario incorporar una secuencia de petición y envío de movimiento, pero solo se comenzará a realizar la petición de movimiento una vez se muestre un modelo ya en el visor. La estructura de este mensaje será una versión reducida del mensaje para crear un modelo. En este caso únicamente se deberá enviar la nueva posición mediante la clase ``Pose3D'' y el identificador del modelo que se desea mover. Por tanto, la estructura quedará de la siguiente manera:
-\begin{itemize}
-	\item	Pose3D
-	\begin{itemize}
-		\item Coordenada ``X''
-		\item Coordenada ``Y''
-		\item Coordenada ``Z''
-		\item ``h''
-		\item Cuaternión ``q0''
-		\item Cuaternión ``q1''
-		\item Cuaternión ``q2''
-		\item Cuaternión ``q3''
-	\end{itemize}
-	\item Identificador
-\end{itemize}
-En este caso, se vuelve a poder enviar una secuencia de movimientos para uno o más modelos, por lo que, al no tener el impedimento del tamaño de los archivos o del identificador, se decide permitir el envío de buffers con estas secuencias de movimiento de manera que si entre petición y petición, se ha movido un modelo varias veces o se han movido varios modelos que se muestran en el visor, se pueda realizar esos movimientos al mismo tiempo en el visor, evitando largos retardos que provocarían enviar los movimientos de uno en uno. Sin embargo, como es evidente, en esta ocasión el refresco no se envíe al no tener sentido eliminar todo lo que se muestra en la escena, sí estamos enviando la actualización de algo que se muestra en la escena. Teniendo en cuenta esto, la estructura final del mensaje será la siguiente:
-\begin{itemize}
-	\item Buffer de movimientos
-	\begin{itemize}
-		\item	Pose3D
-		\begin{itemize}
-			\item Coordenada ``X''
-			\item Coordenada ``Y''
-			\item Coordenada ``Z''
-			\item ``h''
-			\item Cuaternión ``q0''
-			\item Cuaternión ``q1''
-			\item Cuaternión ``q2''
-			\item Cuaternión ``q3''
-		\end{itemize}
-		\item Identificador
-	\end{itemize}
-\end{itemize}
-
-\subsection{Interfaz Slice}
-En la plataforma JdeRobot hay una gran cantidad de interfaces slice creadas para la interconexión de varios drivers y aplicaciones ya existentes, por lo que se ha realizado en este trabajo es ampliar varias de esas interfaces y utilizar otras ya creadas, en concreto se han utilizado las interfaces ``primitives.ice'', ``pose3d.ice'' y ``visualization.ice''. Estas interfaces contienen la definición de la estructura de los mensajes indicado anteriormente en este capitulo y las funciones que se utilizaran para el intercambio de los mismos.
-
-\subsubsection{primitives.ice}
-Esta interface contiene las estructura necesarias para el intercambio de puntos y segmentos. A continuación se muestra como se define estas estructuras:
-
-\begin{lstlisting}[frame=single]
-#ifndef PRIMITIVES_ICE
-#define PRIMITIVES_ICE
-
-module jderobot{
-	struct RGBPoint{
-      		float x;
-      		float y;
-      		float z;
-      		float r;
-      		float g;
-      		float b;
-	};
-	struct Point{
-		float x;
-	    	float y;
-	    	float z;
-	};
-	struct Segment{
-	    	Point fromPoint;
-	    	Point toPoint;
-	};
-};
-#endif
-\end{lstlisting}
-Esta interface contiene tres estructuras diferentes. La primera estructura corresponde al formato del punto que se utilizará para mostrarlos en el visor, ya que como se puede ver contiene las coordenadas para colocar el punto y las componentes RGB para indicar el color. La segunda estructura corresponde también a un punto pero únicamente contiene las coordenadas, esta estructura es utilizada para definir la tercera estructura de la interface que es el segmento, ya que, como se ha indicado, esta formada por dos puntos. 
-
-\subsubsection{pose3d.ice}
-Esta interfaz es la que se utiliza para definir la ubicación y el movimiento de los modelos 3D, utilizando Pose3D. A continuación se muestra el contenido de esta interface:
-
-
-\begin{lstlisting}[frame=single]
-#ifndef POSE3D_ICE
-#define POSE3D_ICE
-
-module jderobot{
-
-  class Pose3DData
-  {
-		float x;
-		float y;
-		float z;
-  		float h;
-		float q0;
-		float q1;
-		float q2;
-		float q3;
-  };
-
-}; 
-#endif
-\end{lstlisting}
-Como se puede ver, en este caso en lugar de usar ``struct'' como en el caso anterior, se usa el tipo ``Class'' de Slice  ya que esta interface se usa en otros componentes de la plataforma JdeRobot donde es necesario que sea así (ofrece una serie de posibilidades que no ofrece el tipo ``struct''). En términos de este trabajo, se manejarán los dos tipos por igual.
-
-\subsubsection{visualization.ice}
-Esta interface será la clave del visor, ya que contendrá las estructuras finales que se usarán en el visor y las funciones que facilitaran el intercambio de mensajes entre el visor y el servidor. A continuación se muestra el contenido de este archivo:
-
-\begin{lstlisting}[frame=single]
-#ifndef VISUALIZATION_ICE
-#define VISUALIZATION_ICE
-
-#include <primitives.ice>
-#include <pose3d.ice>
-
-module jderobot{
-
-	struct Color{
-	    float r;
-	    float g;
-	    float b;
-	};
-
-	struct RGBSegment{
-	    Segment seg;
-	    Color c;
-	};
-
-	sequence<RGBSegment> Segments;
-	sequence<RGBPoint> Points;
-
-	struct bufferSegments{
-		Segments buffer;
-		bool refresh;
-	};
-
-	struct bufferPoints{
-		Points buffer;
-		bool refresh;
-	};
-
-  	struct object3d {
-    		string obj;
-    		string id;
-    		string format;
-    		float scale;
-    		Pose3DData pos;
-    		bool refresh;
-  	};
-
-  	struct PoseObj3D{
-    		string id;
-    		Pose3DData pos;
- 	 };
-
-  	sequence<PoseObj3D> bufferPoseObj3D;
-
-	interface Visualization
-	{
-	      	bufferSegments getSegment ();
-	      	bufferPoints getPoints();
-        		object3d getObj3D(string id);
-        		bufferPoseObj3D getPoseObj3DData();
-	};
-};
-#endif
-\end{lstlisting}
-Lo primero que se define en este archivo es una estructura con las componentes de color RGB para extender la estructura de los segmentos dando lugar a una nueva. A continuación se definen los arrays para crear los buffers para enviar varios puntos y segmentos en lugar de uno de cada tipo, para posteriormente definir las estructuras definitivas que se utilizaran para el envío y recepción de los puntos y segmentos y, que como se explicó en el momento de describir el formato de los mensajes, contendrá los buffers y un booleano para indicar el refresco o no del visor.
-Las dos siguientes estructuras corresponden a la definición de los mensajes del modelo 3D y del movimiento del mismo, utilizando la clase Pose3DData creada en la interface anterior y los parámetros explicados en secciones anteriores (el archivo con el modelo, id, formato, escala, etc.). En el caso de la estructura del mensaje del movimiento, al enviarse más de un movimiento por mensaje, se crea una secuencia para definir el buffer que los contendrá.
-
-Esta interface, a diferencia de los dos anteriores, contiene la definición de las cuatro funciones que serán las encargadas de realizar las peticiones y respuestas para cada tipo de elemento. Estas funciones son realmente la interface. En el momento de crear la conexión, como se verá más tarde, esta interfaz será invocada por parte del visor y se conectará con el servidor para verificar que ambos están usando la misma, de no ser así, la conexión no se realizará.
-
 
 \section{Interfaz gráfica}
 La interfaz gráfica del visor está diseñada usando WebGL, y más concretamente usando la biblioteca Three.js descrita en capítulos anteriores.La interfaz será íntegramente el visor (no tendrá ningún elemento adicional), el cual mostrará inicialmente una rejilla que hará de plano horizontal, cuyo centro será la posición (0, 0, 0) del eje de coordenadas. Además es necesario añadir iluminación y una cámara para poder visualizar la escena.
@@ -385,10 +118,10 @@ Finalmente se crea el segmento a partir de la geometría y el material creado, d
 \end{figure}
 
 \subsection{Visualizar objetos 3D}
-Un modelo 3D es una representación matemática de un objeto tridimensional y que se puede guardar en un archivo de definición de geometría. El visor será capaz de representar dos formatos diferentes de estos archivos, ``obj'' y ``dae'' y moverlos cuando el servidor lo quiera. 
+Un objeto 3D es una representación matemática de un objeto tridimensional y que se puede guardar en un archivo de definición de geometría. El visor será capaz de representar dos formatos diferentes de estos archivos, ``obj'' y ``dae'' y moverlos cuando el servidor lo quiera. 
 
-\subsection{Creación y visualización de los modelos 3D}
-Los modelos 3D podrán ser recibidos o bien a través del archivo completo como texto plano, o bien a través de una url. El visor será capaz de representar el modelo 3D y ubicarlo en la posición indicada. El siguiente código muestra como identificar si el modelo viene como texto plano o url, para posteriormente invocar a la función correspondiente dependiendo el formato del modelo:
+\subsubsection{Creación y visualización de los objetos 3D}
+Los objetos 3D podrán ser recibidos o bien a través del archivo completo como texto plano, o bien a través de una url. El visor será capaz de representar el objeto 3D y ubicarlo en la posición indicada. El siguiente código muestra como identificar si el objeto viene como texto plano o url, para posteriormente invocar a la función correspondiente dependiendo el formato del objeto:
 \begin{lstlisting}[frame=single]
 function addObj(obj,pos){
 	var type = obj.obj.split(":");
@@ -405,14 +138,14 @@ function addObj(obj,pos){
 	}
 }
 \end{lstlisting}
-Cuando recibimos el modelo procedente del servidor, lo primero que se hará es truncar el objeto para poder analizarse y esclarecer si lo que está enviando el servidor es el archivo completo o una url al archivo completo. Dado que de tratarse de una url, debe contener ``https://'' o ``http://'', se puede truncar mediante ``:'' y, con una sentencia condicional verificar si la primera parte de la separación es ``https'', ``http'' u otra cosa. En caso de ser ``https'' o ``http'', lo que lo que se ha recibido es la ruta al archivo, sino, lo que se ha recibido es el modelo completo y se debe generar un archivo virtual utilizando el objeto Blob (objeto que representa un fichero) y posteriormente generar una url virtual, ya que se ha recibido como texto plano y para poder visualizarlo es necesario que el modelo sea un archivo y se tenga una ruta al mismo. Como se puede ver, por ambos caminos tenemos una url, de modo que ya es posible representar el modelo del mismo modo.
+Cuando recibimos el objeto procedente del servidor, lo primero que se hará es truncar el objeto para poder analizarse y esclarecer si lo que está enviando el servidor es el archivo completo o una url al archivo completo. Dado que de tratarse de una url, debe contener ``https://'' o ``http://'', se puede truncar mediante ``:'' y, con una sentencia condicional verificar si la primera parte de la separación es ``https'', ``http'' u otra cosa. En caso de ser ``https'' o ``http'', lo que lo que se ha recibido es la ruta al archivo, sino, lo que se ha recibido es el objeto completo y se debe generar un archivo virtual utilizando el objeto Blob (objeto que representa un fichero) y posteriormente generar una url virtual, ya que se ha recibido como texto plano y para poder visualizarlo es necesario que el objeto sea un archivo y se tenga una ruta al mismo. Como se puede ver, por ambos caminos tenemos una url, de modo que ya es posible representar el objeto del mismo modo.
 
-Una vez se tiene la url del modelo, es necesario saber el formato del archivo del modelo (``obj'' o ``dae''), ya que no se carga el modelo de la misma forma. Identificar el formato es sencillo, ya que vendrá indicado por el servidor y, dependiendo del formato, se invoca a la función correspondiente pasando por parámetro la url y la posición del objeto en el visor (coordenadas y orientación del modelo) recibidas del servidor.
+Una vez se tiene la url del objeto, es necesario saber el formato del archivo del objeto (``obj'' o ``dae''), ya que no se carga el objeto de la misma forma. Identificar el formato es sencillo, ya que vendrá indicado por el servidor y, dependiendo del formato, se invoca a la función correspondiente pasando por parámetro la url y la posición del objeto en el visor (coordenadas y orientación del objeto) recibidas del servidor.
 
 \begin{itemize}
-\item {\textbf{\underline{Representar modelos del tipo obj}}
+\item {\textbf{\underline{Representar objetos del tipo obj}}
 
-Un archivo ``obj'' es conocido como Wavefront 3D Object File y desarrollado por Wavefront Technologies. Es un formato de archivo usado para un objeto tridimensional que contiene las coordenadas 3D (líneas poligonales y puntos), mapas de textura, y otra información de objetos. La biblioteca Three.js nos proporciona un API para poder cargar y mostrar un modelo de este tipo a través de una url. El siguiente código carga y muestra un modelo ``obj'':
+Un archivo ``obj'' es conocido como Wavefront 3D Object File y desarrollado por Wavefront Technologies. Es un formato de archivo usado para un objeto tridimensional que contiene las coordenadas 3D (líneas poligonales y puntos), mapas de textura, y otra información de objetos. La biblioteca Three.js nos proporciona un API para poder cargar y mostrar un objeto de este tipo a través de una url. El siguiente código carga y muestra un objeto ``obj'':
 
 \begin{lstlisting}[frame=single]
 function loadObj(url,obj,pose3d){
@@ -435,12 +168,12 @@ function loadObj(url,obj,pose3d){
 }
 \end{lstlisting}
 
-El código anterior lo primero que hace es inicializar el API de Three.js para cargar un modelo ``obj'' y se llama a la función del API encargada de cargar el modelo. Esta función tiene como parámetros la url y otras tres funciones más. La primera función es la encargada de cargar el modelo y mostrar el mismo en el visor, la segunda función se ejecuta mientras se está cargando el modelo (por ejemplo, para mostrar una barra de progreso) y la última función se ejecutará si ocurre algún error durante la carga. La primera función es la importante, en ella identificamos al objeto dándole un id previamente establecido y lo añadimos a un array, y que se explicará en siguientes secciones, para poder borrarlo o moverlo posteriormente, se posiciona el modelo mediante las coordenadas enviadas por el servidor, teniendo en cuenta el problema explicado en las secciones anteriores acerca de la disparidad entre los sistemas de coordenadas, y se orienta mediante la rotación correspondiente a cada eje, que nos es enviada en radianes y se debe convertir a grados.
-Finalmente, se añade el modelo al visor.}
+El código anterior lo primero que hace es inicializar el API de Three.js para cargar un objeto ``obj'' y se llama a la función del API encargada de cargar el objeto. Esta función tiene como parámetros la url y otras tres funciones más. La primera función es la encargada de cargar el objeto y mostrar el mismo en el visor, la segunda función se ejecuta mientras se está cargando el objeto (por ejemplo, para mostrar una barra de progreso) y la última función se ejecutará si ocurre algún error durante la carga. La primera función es la importante, en ella identificamos al objeto dándole un id previamente establecido y lo añadimos a un array, y que se explicará en siguientes secciones, para poder borrarlo o moverlo posteriormente, se posiciona el objeto mediante las coordenadas enviadas por el servidor, teniendo en cuenta el problema explicado en las secciones anteriores acerca de la disparidad entre los sistemas de coordenadas, y se orienta mediante la rotación correspondiente a cada eje, que nos es enviada en radianes y se debe convertir a grados.
+Finalmente, se añade el objeto al visor.}
 
-\item{\textbf{\underline{Representar modelos del tipo dae}}
+\item{\textbf{\underline{Representar objetos del tipo dae}}
 
-Un archivo ``dae'', también conocido como archivo ``Collada'', es un formato de intercambio de archivos 3D utilizado para el intercambio activo entre programas de gráficos y basado en el esquema XML Collada. La biblioteca Three.js proporciona un API para la carga y visualización de este formato a partir de una url. El siguiente código carga y muestra un modelo ``dae'':
+Un archivo ``dae'', también conocido como archivo ``Collada'', es un formato de intercambio de archivos 3D utilizado para el intercambio activo entre programas de gráficos y basado en el esquema XML Collada. La biblioteca Three.js proporciona un API para la carga y visualización de este formato a partir de una url. El siguiente código carga y muestra un objeto ``dae'':
 \begin{lstlisting}[frame=single]
 function loadDae (url,obj,pose3d){
 	var loader = new THREE.ColladaLoader();
@@ -461,34 +194,34 @@ function loadDae (url,obj,pose3d){
 		});
 }
 \end{lstlisting}
-Cómo se puede apreciar, el código es igual que el utilizado para el formato ``obj'', únicamente cambia la inicialización del API que en este caso es el API para cargar un archivo ``dae'' o ``Collada'' y la obtención del modelo, ya que se debe referenciar al mismo para poder cargarlo en el visor. El resto del código es el mismo para ambos casos.}
+Cómo se puede apreciar, el código es igual que el utilizado para el formato ``obj'', únicamente cambia la inicialización del API que en este caso es el API para cargar un archivo ``dae'' o ``Collada'' y la obtención del objeto, ya que se debe referenciar al mismo para poder cargarlo en el visor. El resto del código es el mismo para ambos casos.}
 \end{itemize}
-Estas funciones serán invocadas cada vez que se reciba un modelo nuevo que mostrar. Indicar que si bien en esta memoria se muestra dos funciones diferentes para cargar un modelo ``obj'' o ``dae'' de modo que quede lo más claro posible, en el código final se agrupa en una única función, utilizando en ella la sentencia condicional para identificar el tipo de formato del modelo, evitándonos el uso de código repetido. La siguiente imagen muestra dos modelos (cada uno de un formato) en el visor
+Estas funciones serán invocadas cada vez que se reciba un objeto nuevo que mostrar. Indicar que si bien en esta memoria se muestra dos funciones diferentes para cargar un objeto ``obj'' o ``dae'' de modo que quede lo más claro posible, en el código final se agrupa en una única función, utilizando en ella la sentencia condicional para identificar el tipo de formato del objeto, evitándonos el uso de código repetido. La siguiente imagen muestra dos objetos (cada uno de un formato) en el visor
 
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.8\textwidth]{figures/visualizarmodel.png}
-		\caption{Modelos 3D mostrados en el visor}
+		\caption{Objetos 3D mostrados en el visor}
 		\label{fig.visualizarmodel}
 		\end{center}
 \end{figure}
-\subsection{Mover los modelos 3D}
-A diferencia de un punto o un segmento, que es más sencillo eliminarlo y volver a crearlo en la nueva posición, un modelo 3D nos interesa reubicarlo a la nueva posición en lugar de eliminarlo y crearlo de nuevo, lo que conllevaría tener que enviar una url o un texto plano con el archivo del modelo y cargarlo de nuevo, teniendo un retardo y carga de trabajo importante para el visor.
+\subsubsection{Mover los objetos 3D}
+A diferencia de un punto o un segmento, que es más sencillo eliminarlo y volver a crearlo en la nueva posición, un objeto 3D nos interesa reubicarlo a la nueva posición en lugar de eliminarlo y crearlo de nuevo, lo que conllevaría tener que enviar una url o un texto plano con el archivo del objeto y cargarlo de nuevo, teniendo un retardo y carga de trabajo importante para el visor.
 
-Al haber identificado el modelo mediante un id único (en el caso del punto y la recta, el id es el mismo para cada elemento), nos permite realizar el movimiento. Esto se realiza mediante la siguiente secuencia de código:
+Al haber identificado el objeto mediante un id único (en el caso del punto y la recta, el id es el mismo para cada elemento), nos permite realizar el movimiento. Esto se realiza mediante la siguiente secuencia de código:
 \begin{lstlisting}[frame=single]
-function moveObj(modelo){
-	selectedObject = scene.getObjectByName(modelo.id);
-	selectedObject.position.set(modelo.x, modelo.z, modelo.y);
-	selectedObject.rotation.set(modelo.rx*toDegrees, modelo.rz * toDegrees, 
-							modelo.ry * toDegrees,);
+function moveObj(objeto){
+	selectedObject = scene.getObjectByName(objeto.id);
+	selectedObject.position.set(objeto.x, objeto.z, objeto.y);
+	selectedObject.rotation.set(objeto.rx*toDegrees, objeto.rz * toDegrees, 
+							objeto.ry * toDegrees,);
 }
 \end{lstlisting}
-Como se puede apreciar, mover el modelo es mucho más rápido y sencillo que eliminarlo y crearlo de nuevo. Primero seleccionamos el modelo mediante el identificador, posteriormente reubicamos el modelo seleccionado a las nuevas coordenadas y le aplicamos la nueva orientación. La imagen que se muestra a continuación corresponde a los modelos anteriores desplazados y rotados:
+Como se puede apreciar, mover el objeto es mucho más rápido y sencillo que eliminarlo y crearlo de nuevo. Primero seleccionamos el objeto mediante el identificador, posteriormente reubicamos el objeto seleccionado a las nuevas coordenadas y le aplicamos la nueva orientación. La imagen que se muestra a continuación corresponde a los objetos anteriores desplazados y rotados:
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.8\textwidth]{figures/movermodelos.png}
-		\caption{Modelos 3D reubicados y rotados}
+		\caption{Objetos 3D reubicados y rotados}
 		\label{fig.movermodelos}
 		\end{center}
 \end{figure}
@@ -506,10 +239,290 @@ function deleteObj(){
 	}
 }
 \end{lstlisting}
-En este código lo que se hace es recorrer el array con los identificadores de todos los objetos que hay en el visor y que se han ido añadiendo en el momento de incluir al visor los modelos (dado que los puntos y los segmentos tienen el mismo id, son añadidos a la lista de identificadores cuando se reciben los primeros elementos de cada tipo). Se selecciona el objeto en el visor que coincida con el identificador de la lista. Posteriormente se realiza otro bucle para eliminar todos los elementos del visor con ese identificador (esto se realiza para los segmentos y los puntos, que como ya se ha indicado, todos tiene el mismo).
+En este código lo que se hace es recorrer el array con los identificadores de todos los objetos que hay en el visor y que se han ido añadiendo en el momento de incluir al visor los objetos (dado que los puntos y los segmentos tienen el mismo id, son añadidos a la lista de identificadores cuando se reciben los primeros elementos de cada tipo). Se selecciona el objeto en el visor que coincida con el identificador de la lista. Posteriormente se realiza otro bucle para eliminar todos los elementos del visor con ese identificador (esto se realiza para los segmentos y los puntos, que como ya se ha indicado, todos tiene el mismo).
 
-\section{Conexión con el servidor y recepción de los objetos 3D}
-En esta sección se va a tratar cómo se realiza la conexión y la posterior recepción de cada uno de los objetos y modelos 3D anteriormente indicados. La conexión se realizará mediante el middleware ICE, explicado en capítulos anteriores, y su lenguaje de especificación Slice nombrando a los ficheros creados con este lenguaje interfaces slice. Lo primero que se detallará en este capitulo serán estas interfaces, ya que son la base de la conexión y que tanto el servidor como el visor deben compartir. Si alguna de las dos partes no usan la misma interfaz, la conexión no podrá llevarse a cabo correctamente. Después, se detallará como se realiza la conexión con el servidor y la posterior petición de cada tipo de objeto. Finalmente, se explicará cómo se realiza la recepción de cada objeto y el tratamiento que recibe cada uno para su posterior visualización en el visor mediante las funciones indicadas en la anterior sección.
+\section{Mensajes}
+En esta sección se describirá la estructura de los mensajes para cada tipo y como se definen utilizando el lenguaje de descripción Slice, explicado en el capitulo 3 de esta memoria. 
+\subsection{Estructura del mensaje para visualizar los puntos}
+Para representar un punto, como veremos en la siguiente sección, únicamente necesitamos una posición en el eje de coordenadas y el color que tendrá el punto. Teniendo en cuenta esto, la estructura del mensaje sería muy simple:
+\begin{itemize}
+\item Coordenada ``X''
+\item Coordenada ``Y''
+\item Coordenada ``Z''
+\item Componente de color ``R'' (valor decimal entre 0 y 1)
+\item Componente de color ``G'' (valor decimal entre 0 y 1)
+\item Componente de color ``B'' (valor decimal entre 0 y 1)
+\end{itemize}
+
+Esta estructura es definida mediante el lenguaje Slice de la siguiente forma en el archivo ``primitives.ice'', que contendrá las definiciones de las estructuras intermedias creadas para definir estrucutras más complejas y definitivas :
+
+\begin{lstlisting}[frame=single]
+#ifndef PRIMITIVES_ICE
+#define PRIMITIVES_ICE
+
+module jderobot{
+	struct RGBPoint{
+      		float x;
+      		float y;
+      		float z;
+      		float r;
+      		float g;
+      		float b;
+	};
+};
+#endif
+\end{lstlisting}
+
+Sin embargo, como se ha explicado anteriormente, el visor tiene la iniciativa y solicitará si hay nuevos puntos que mostrar cada cierto periodo de tiempo. Dado que puede interesar que este periodo sea largo para evitar constantes peticiones y mayor carga de trabajo, se ha decidido que no solo se pueda enviar un punto en cada petición, sino que se pueda enviar un buffer de puntos. La estructura del mensaje por tanto no será una posición en el eje de coordenadas y el color, sino una colección variable de estos elementos (podrá ser uno o más).
+Finalmente, para dar la posibilidad al servidor de indicar si desea añadir o eliminar lo que se muestra en ese momento en el visor (refrescar la escena que muestra el visor), al mensaje se le añade un booleano que valga True, si se desea eliminar lo que se muestra en ese momento y únicamente que se visualice lo que se transmite en ese mensaje, o False, si lo que se desea es añadir lo transmitido en este mensaje a lo que ya se muestra.
+Por tanto el mensaje quedará como sigue:
+\begin{itemize}
+\item Buffer de puntos con los siguientes parámetros:
+	\begin{itemize}
+	\item Coordenada ``X''
+	\item Coordenada ``Y''
+	\item Coordenada ``Z''
+	\item Componente de color ``R'' (valor decimal entre 0 y 1)
+	\item Componente de color ``G'' (valor decimal entre 0 y 1)
+	\item Componente de color ``B'' (valor decimal entre 0 y 1)
+	\end{itemize}
+\item Refresco del visor
+\end{itemize}
+
+Esta estructura final del mensaje con el buffer de puntos y el refresco estará definida en el archivo Slice ``visualization.ice'', donde se definen las estructuras definitivas de los mensajes, utilizando las primitivas creadas en el archivo ``primitives.ice'':
+
+\begin{lstlisting}[frame=single]
+#ifndef VISUALIZATION_ICE
+#define VISUALIZATION_ICE
+
+#include <primitives.ice>
+
+module jderobot{
+
+	sequence<RGBPoint> Points;
+
+	struct bufferPoints{
+		Points buffer;
+		bool refresh;
+	};
+};
+#endif
+\end{lstlisting}
+
+
+\subsection{Estructura del mensaje para visualizar segmentos}
+Como se verá en la siguiente sección, para visualizar un segmento únicamente es necesario enviar la posición en el eje de coordenadas de dos puntos y el color con el que se desea visualizar el segmento. Por tanto, la estructura del mensaje para representar un segmento será la siguiente:
+\begin{itemize}
+\item Punto de inicio
+	\begin{itemize}
+		\item Coordenada ``X''
+		\item Coordenada ``Y''
+		\item Coordenada ``Z''
+	\end{itemize}
+\item Punto de fin
+	\begin{itemize}
+		\item Coordenada ``X''
+		\item Coordenada ``Y''
+		\item Coordenada ``Z''
+	\end{itemize}
+\item Componente de color ``R'' (valor decimal entre 0 y 1)
+\item Componente de color ``G'' (valor decimal entre 0 y 1)
+\item Componente de color ``B'' (valor decimal entre 0 y 1)
+\end{itemize}
+
+Se extiende el archivo ``primitives.ice'' para incluir las estructuras intermedias necesarias:
+
+\begin{lstlisting}[frame=single]
+structu Point{
+	float x;
+      	float y;
+      	float z;
+};
+
+struct Segment{
+	Point fromPoint;
+	Point toPoint;
+};
+
+
+struct RGBSegment{
+	Segment seg;
+	float r;
+	float g;
+	float b;
+};
+
+\end{lstlisting}
+
+
+Sin embargo, al igual que para el caso de los puntos, se desea poder enviar varios segmentos. El mensaje, por tanto, contendrá un buffer de segmentos cuya estructura será una colección de dos puntos, con su posición en el eje de coordenadas, y el color de cada segmento.
+Finalmente, también se incluye el booleano para indicar si se debe refrescar el visor o por el contrario simplemente se deben añadir a lo que ya se muestra.
+La estructura final del mensaje de envío de segmentos será la siguiente:
+\begin{itemize}
+	\item Buffer de segmentos
+	\begin{itemize}
+		\item Punto de inicio
+		\begin{itemize}
+			\item Coordenada ``X''
+			\item Coordenada ``Y''
+			\item Coordenada ``Z''
+		\end{itemize}
+		\item Punto de fin
+		\begin{itemize}
+			\item Coordenada ``X''
+			\item Coordenada ``Y''
+			\item Coordenada ``Z''
+		\end{itemize}
+		\item Componente de color ``R'' (valor decimal entre 0 y 1)
+		\item Componente de color ``G'' (valor decimal entre 0 y 1)
+		\item Componente de color ``B'' (valor decimal entre 0 y 1)
+	\end{itemize}
+	\item Refresco del visor
+\end{itemize}
+
+Ahora es necesario definir el formato definitivo del mensaje, para ello se extenderá el archivo ``visualization.ice'' de la siguiente forma:
+
+\begin{lstlisting}[frame=single]
+	
+sequence<RGBSegment> Segments;
+	
+struct bufferSegments{
+	Segments buffer;
+	bool refresh;
+};
+\end{lstlisting}
+
+\subsection{Estructura del mensaje para visualizar un objeto 3D}
+En este caso, primero hay que indicar que el mensaje de petición es algo diferente a los casos anteriores. Mientras que para los segmentos y para los puntos únicamente se hace la petición sin añadir ningún parámetro a la misma (la forma de realizar la petición se detallará en secciones posteriores), en el caso de las peticiones de un objeto 3D desde el visor 3D al servidor, se le debe incluir el identificador que se le va a dar al objeto (en caso de que el servidor tenga uno para enviar), de modo que tanto visor como servidor puedan relacionar las peticiones de movimiento o borrado de un objeto mediante este identificador.
+Una vez explicado esto, ya podemos ver cómo es la estructura del mensaje para visualizar un objeto 3D. Para mostrar un objeto, se necesita conoces el archivo que contiene el objeto, el formato del archivo, la posición en el eje de coordenadas, la orientación del objeto y la escala del objeto. 
+
+El archivo puede ser enviado de dos formas, la primera forma es mediante una url a un servidor externo o página web, la segunda forma es enviar el fichero como texto plano, sin embargo esta segunda vía tiene el inconveniente de que no pueden ser enviados archivos de más de 1 MB de tamaño, por lo que si se quiere enviar un archivo más grande, debe realizarse mediante url.
+
+El formato del archivo, como se explicará en próximas secciones, puede ser del tipo ``dae'' o ``obj''. Estos dos formatos son los más utilizados a la hora de crear objetos 3D y por tanto se considerá que dando soporte a los dos formatos permite usar cualquier objeto que se desee.
+
+La escala del objeto será un número decimal que indicará el tamaño con el que se desea mostrar el objeto, permitiendo así mostrar varias veces el mismo objeto pero cambiando de tamaño (por ejemplo, podemos querer mostrar un brazo humano en diferentes tamaños para representar a un niño y a un adulto).
+
+Por último, tanto para la posición como para la orientación se usará la clase ``Pose3D''. Esta clase esta formada por las coordenadas ``X'', ``Y'' y ``Z'', una componente ``h'' que no se utilizara, y los cuaterniones ``q0'', ``q1'', ``q2'' y ``q3'' para después usando las formulas matemáticas correspondientes y que se explicaran más adelante, nos proporciona la orientación del objeto.
+
+Por tanto, el formato del mensaje tendrá la siguiente estructura:
+\begin{itemize}
+	\item Archivo con el objeto 3D
+	\item Formato del archivo
+	\item	Pose3D
+	\begin{itemize}
+		\item Coordenada ``X''
+		\item Coordenada ``Y''
+		\item Coordenada ``Z''
+		\item ``h''
+		\item Cuaternión ``q0''
+		\item Cuaternión ``q1''
+		\item Cuaternión ``q2''
+		\item Cuaternión ``q3''
+	\end{itemize}
+	\item Escala
+	\item Identificador
+	\item Refresco del visor
+\end{itemize}
+Como se puede ver, se vuelve a enviar el identificador que había sido previamente transmitido por el visor, y se añade también el refresco al igual que para los puntos y los segmentos. Sin embargo, debido a las limitaciones de tamaño de los archivos que se pueden enviar mediante ICE, y la necesidad de establecer un identificador común, solo es posible enviar un objeto 3D por petición realizada y no un buffer de objetos, como si podemos hacer con los puntos y los segmentos.
+
+La clase ``Pose3D'' es definida en un nuevo archivo Slice llamado ``pose3d.ice'':
+
+\begin{lstlisting}[frame=single]
+#ifndef POSE3D_ICE
+#define POSE3D_ICE
+
+module jderobot{
+
+  class Pose3DData
+  {
+		float x;
+		float y;
+		float z;
+  		float h;
+		float q0;
+		float q1;
+		float q2;
+		float q3;
+  };
+
+}; 
+#endif
+\end{lstlisting}
+
+Este mensaje quedará definido en el archivo Slice ``visualization.ice'', al tratarse de un formato final y no de una primitiva (se trata de una estructura de mensaje final y no una estructura intermedia para crear nuevas). Además, es necesario incluir al principio la referencia al archivo `pose3d.ice'':
+
+\begin{lstlisting}[frame=single]
+
+#include <pose3d.ice>
+	....
+  	struct object3d {
+    		string obj;
+    		string id;
+    		string format;
+    		float scale;
+    		Pose3DData pos;
+    		bool refresh;
+  	};
+
+ \end{lstlisting}
+
+
+\subsection{Estructura del mensaje para mover los objetos 3D}
+Como se explicará en secciones sucesivas, los objetos 3D que se visualizan probablemente se deseen moverlos de posición u orientación y borrarlos y crearlos de nuevo implica un mayor retardo y carga de trabajo, por lo que ha sido necesario incorporar una secuencia de petición y envío de movimiento, pero solo se comenzará a realizar la petición de movimiento una vez se muestre un objeto ya en el visor. La estructura de este mensaje será una versión reducida del mensaje para crear un objeto. En este caso únicamente se deberá enviar la nueva posición mediante la clase ``Pose3D'' y el identificador del objeto que se desea mover. Por tanto, la estructura quedará de la siguiente manera:
+\begin{itemize}
+	\item	Pose3D
+	\begin{itemize}
+		\item Coordenada ``X''
+		\item Coordenada ``Y''
+		\item Coordenada ``Z''
+		\item ``h''
+		\item Cuaternión ``q0''
+		\item Cuaternión ``q1''
+		\item Cuaternión ``q2''
+		\item Cuaternión ``q3''
+	\end{itemize}
+	\item Identificador
+\end{itemize}
+
+Este mensaje queda definido en el archivo ``visualization.ice'', al tratarse de un movimiento y no de un elemento nuevo:
+
+\begin{lstlisting}[frame=single]
+
+struct PoseObj3D{
+    	Pose3DData pos;
+	string id;
+ };
+\end{lstlisting}
+
+En este caso, se vuelve a poder enviar una secuencia de movimientos para uno o más objetos, por lo que, al no tener el impedimento del tamaño de los archivos o del identificador, se decide permitir el envío de buffers con estas secuencias de movimiento de manera que si entre petición y petición, se ha movido un objeto varias veces o se han movido varios objetos que se muestran en el visor, se pueda realizar esos movimientos al mismo tiempo en el visor, evitando largos retardos que provocarían enviar los movimientos de uno en uno. Sin embargo, como es evidente, en esta ocasión el refresco no se envíe al no tener sentido eliminar todo lo que se muestra en la escena, sí estamos enviando la actualización de algo que se muestra en la escena. Teniendo en cuenta esto, la estructura final del mensaje será la siguiente:
+\begin{itemize}
+	\item Buffer de movimientos
+	\begin{itemize}
+		\item	Pose3D
+		\begin{itemize}
+			\item Coordenada ``X''
+			\item Coordenada ``Y''
+			\item Coordenada ``Z''
+			\item ``h''
+			\item Cuaternión ``q0''
+			\item Cuaternión ``q1''
+			\item Cuaternión ``q2''
+			\item Cuaternión ``q3''
+		\end{itemize}
+		\item Identificador
+	\end{itemize}
+\end{itemize}
+
+El mensaje final queda definido de la siguiente forma en el archivo ``visualization.ice'':
+
+\begin{lstlisting}[frame=single]
+
+sequence<PoseObj3D> bufferPoseObj3D;
+
+\end{lstlisting}
+
+\section{Conexiones}
+En esta sección se va a tratar cómo se realiza la conexión y la posterior recepción de cada uno de los objetos y objetos 3D anteriormente indicados. La conexión se realizará mediante el middleware ICE, explicado en capítulos anteriores, y su lenguaje de especificación Slice nombrando a los ficheros creados con este lenguaje interfaces slice. Lo primero que se detallará en este capitulo serán estas interfaces, ya que son la base de la conexión y que tanto el servidor como el visor deben compartir. Si alguna de las dos partes no usan la misma interfaz, la conexión no podrá llevarse a cabo correctamente. Después, se detallará como se realiza la conexión con el servidor y la posterior petición de cada tipo de objeto. Finalmente, se explicará cómo se realiza la recepción de cada objeto y el tratamiento que recibe cada uno para su posterior visualización en el visor mediante las funciones indicadas en la anterior sección.
 
 \subsection{Conexión y peticiones al servidor}
 Lo primero que hay que indicar es que para la conexión e intercambios con el servidor, el visor hace uso de los Web Workers de HTML5 \footnote{\url{https://www.w3schools.com/html/html5_webworkers.asp}} que permite realizar ejecuciones en segundo plano sin bloquear al proceso principal. Su uso es imprescindible para que el hilo principal no se bloquee y pueda mostrar los elementos que se reciban mientras espera la recepción del resto de peticiones realizadas.
@@ -564,7 +577,7 @@ w.onmessage = function(event) {
         }
 \end{lstlisting}
 
-Cuando se pase el tiempo, se activa las funciones que envían el mensaje al Worker para que realice las peticiones al servidor. Estas peticiones serán para todos los objetos igual salvo en el caso de la petición de los modelos 3D, que como se ha explicado anteriormente, enviará el identificador que se dará al modelo en caso de que haya uno. Este identificador será una cadena de ``obj'' y un contador de modelos que hay en la escena, es decir, si no hay modelos en la escena, el siguiente tendrá de identificador ``obj1'', el siguiente ``obj2'' y así sucesivamente. Finalmente, esta función terminará realizando una llamada a la función que se encargará de gestionar las respuestas del servidor. A continuación se muestran estas funciones:
+Cuando se pase el tiempo, se activa las funciones que envían el mensaje al Worker para que realice las peticiones al servidor. Estas peticiones serán para todos los objetos igual salvo en el caso de la petición de los objetos 3D, que como se ha explicado anteriormente, enviará el identificador que se dará al objeto en caso de que haya uno. Este identificador será una cadena de ``obj'' y un contador de objetos que hay en la escena, es decir, si no hay objetos en la escena, el siguiente tendrá de identificador ``obj1'', el siguiente ``obj2'' y así sucesivamente. Finalmente, esta función terminará realizando una llamada a la función que se encargará de gestionar las respuestas del servidor. A continuación se muestran estas funciones:
 
 \begin{lstlisting}[frame=single]
 function setPoint(){
@@ -604,7 +617,22 @@ function setObj(id){
 }
 \end{lstlisting}
 
-Como se puede ver, solo se esta realizando las peticiones para los puntos, los segmentos y los modelos, pero no para los movimientos de los modelos, ya que solo se realiza una vez que se ha recibido un modelo para mostrar. Una vez que se tiene un modelo, se activa la llamada periódica a la función para que envíe el mensaje al Worker para que se realice la petición al servidor de la misma forma que las demás.
+Como se puede ver, solo se esta realizando las peticiones para los puntos, los segmentos y los objetos, pero no para los movimientos de los objetos, ya que solo se realiza una vez que se ha recibido un objeto para mostrar. Una vez que se tiene un objeto, se activa la llamada periódica a la función para que envíe el mensaje al Worker para que se realice la petición al servidor de la misma forma que las demás.
+
+Las funciones para realizar las peticiones al servidor, se han tenido que definir previamente mediante el lenguaje de descriptivo de ICE, Slice. Por tanto, para realizar la definición, se ha extendido el archivo ``visualization.ice'' explicado en la sección sobre los mensajes. A este archivo se le añade los siguiente:
+
+\begin{lstlisting}[frame=single]
+
+interface Visualization
+	{
+	      bufferSegments getSegment ();
+	      bufferPoints getPoints();
+	      object3d getObj3D(string id);
+	      bufferPoseObj3D getPoseObj3DData();
+	};
+};
+
+\end{lstlisting}
 
 \subsection{Recepción y tratamiento de los mensajes recibidos}
 Ya se ha explicado cómo se conecta, se envían los mensajes de petición al servidor y se recepciona la respuesta en el Worker que la transmite al hilo principal. Ahora se explicará cómo se trata esos mensajes el hilo principal para mostrarlo en el visor.
@@ -657,10 +685,10 @@ if (event.data.func == "drawLine"){
 }
 \end{lstlisting}
 
-\subsubsection{Tratar los modelos 3D}
-El tratamiento de los modelos 3D comienza de la misma forma que los otros dos elementos, es decir, se debe revisar si requiere refresco, o no, del visor. Sin embargo, una vez que se ha borrado, o no, el contenido del visor, se actualiza el contador que forma el identificador que se ha indicado en las secciones anteriores. Posteriormente, es necesario realizar la conversión de la ubicación y orientación enviada como ``Pose3D'' a un formato que el método encargado de mostrar los modelos sea capaz de entender.
+\subsubsection{Tratar los objetos 3D}
+El tratamiento de los objetos 3D comienza de la misma forma que los otros dos elementos, es decir, se debe revisar si requiere refresco, o no, del visor. Sin embargo, una vez que se ha borrado, o no, el contenido del visor, se actualiza el contador que forma el identificador que se ha indicado en las secciones anteriores. Posteriormente, es necesario realizar la conversión de la ubicación y orientación enviada como ``Pose3D'' a un formato que el método encargado de mostrar los objetos sea capaz de entender.
 
-Para realizar esta conversión, lo primero que se realiza es crear una clase de JavaScript cuya estructura contendrá los parámetros que se necesitan para mostrar el modelo, es decir la posición en el eje de coordenadas (coordenadas ``x'', ``y'' y ``z''), las orientaciones en cada eje de coordenadas (orientación ``rx'', ``ry'' y ``rz'') y el identificador del modelo 3D. La clase queda por tanto del siguiente modo:
+Para realizar esta conversión, lo primero que se realiza es crear una clase de JavaScript cuya estructura contendrá los parámetros que se necesitan para mostrar el objeto, es decir la posición en el eje de coordenadas (coordenadas ``x'', ``y'' y ``z''), las orientaciones en cada eje de coordenadas (orientación ``rx'', ``ry'' y ``rz'') y el identificador del objeto 3D. La clase queda por tanto del siguiente modo:
 \begin{lstlisting}[frame=single]
 class obj3DPose {
 	constructor(id, x, y, z, rx, ry, rz){
@@ -714,7 +742,7 @@ function getPitch(q0,q1,q2,q3){
 }
 \end{lstlisting}
 
-Finalmente, se crea una función que devuelve un objeto de la nueva clase creada y que tienen ya la conversión. A esta función se le pasa por parámetro el modelo completo recibido y, mediante la llamada a las funciones para realizar la conversión, crea el objeto de la nueva clase que contendrá el identificador, las coordenadas ``x'', ``y'' y ``z'', sin ningún tipo de conversión, y las orientaciones en cada eje convertidas y que están en radianes. Esta función es la siguiente:
+Finalmente, se crea una función que devuelve un objeto de la nueva clase creada y que tienen ya la conversión. A esta función se le pasa por parámetro el objeto completo recibido y, mediante la llamada a las funciones para realizar la conversión, crea el objeto de la nueva clase que contendrá el identificador, las coordenadas ``x'', ``y'' y ``z'', sin ningún tipo de conversión, y las orientaciones en cada eje convertidas y que están en radianes. Esta función es la siguiente:
 
 \begin{lstlisting}[frame=single]
 function getPose3D(data){
@@ -727,7 +755,7 @@ function getPose3D(data){
 }
 \end{lstlisting}
 
-Una vez que ya hemos realizado la conversión, se llama al método encargado de cargar los modelos en el visor y que se explicó en la sección correspondiente. A este método, se le pasa por parámetro el modelo completo recibido del servidor y el objeto de la nueva clase que incorpora la conversión de la orientación, para que pueda mostrar el modelo en el visor. Tras ello, se arranca la petición periódica de movimientos para el modelo (si no estaba arrancada previamente) al tener ya mínimo un modelo para mover. Las siguientes sentencias hacen que tenga lugar todo lo indicado:
+Una vez que ya hemos realizado la conversión, se llama al método encargado de cargar los objetos en el visor y que se explicó en la sección correspondiente. A este método, se le pasa por parámetro el objeto completo recibido del servidor y el objeto de la nueva clase que incorpora la conversión de la orientación, para que pueda mostrar el objeto en el visor. Tras ello, se arranca la petición periódica de movimientos para el objeto (si no estaba arrancada previamente) al tener ya mínimo un objeto para mover. Las siguientes sentencias hacen que tenga lugar todo lo indicado:
 
 \begin{lstlisting}[frame=single]
 else if (event.data.func == "drawObj") {
@@ -745,8 +773,8 @@ else if (event.data.func == "drawObj") {
 }
 \end{lstlisting}
 
-\subsubsection{Tratar el movimiento de los modelos}
-En el caso de los mensajes con el movimiento, al no indicar si hay que refrescar el visor o no, únicamente se recorrerá buffer que contiene todos los movimientos realizando la conversión de Pose3D al formato admitido explicado anteriormente e invocando al método que realiza el movimiento de los modelos explicado en la sección sobre la interfaz gráfica. Cabe indicar que en la clase que se ha creado para la conversión se incluye el identificador del modelo que se va a mover, ya que, a diferencia de cuando invocamos al método que representa el modelo en el visor que se pasaba por parámetro el mensaje completo recibido del servidor y la nueva clase, en este caso solo pasamos por parámetro la nueva clase por lo que es necesario incluir el identificador. El código que se muestra este código:
+\subsubsection{Tratar el movimiento de los objetos}
+En el caso de los mensajes con el movimiento, al no indicar si hay que refrescar el visor o no, únicamente se recorrerá buffer que contiene todos los movimientos realizando la conversión de Pose3D al formato admitido explicado anteriormente e invocando al método que realiza el movimiento de los objetos explicado en la sección sobre la interfaz gráfica. Cabe indicar que en la clase que se ha creado para la conversión se incluye el identificador del objeto que se va a mover, ya que, a diferencia de cuando invocamos al método que representa el objeto en el visor que se pasaba por parámetro el mensaje completo recibido del servidor y la nueva clase, en este caso solo pasamos por parámetro la nueva clase por lo que es necesario incluir el identificador. El código que se muestra este código:
 
 \begin{lstlisting}[frame=single]
 else if (event.data.func == "pose3d") {
@@ -763,7 +791,7 @@ El visor está preparado para ser usado principalmente con Electron, ya que la l
 
 Ejecutarlo con Electron se realiza de la misma manera que se explicó en el capitulo 3, por lo que se considerá que no es necesario repetir el proceso de adaptación de la aplicación para ser usada con Electron.
 
-Para ejecutar el visor 3D y realizar pruebas, se ha creado un servidor de test escrito en python que enviará todos los tipos de elementos y movimientos, enviando valores aleatorias. En cada mensaje podrá envía entre 1 y 5 puntos y rectas, está preparado para enviar 3 modelos (uno en forma de texto plano y dos desde una url) y movimientos aleatorios para esos modelos.
+Para ejecutar el visor 3D y realizar pruebas, se ha creado un servidor de test escrito en python que enviará todos los tipos de elementos y movimientos, enviando valores aleatorias. En cada mensaje podrá envía entre 1 y 5 puntos y rectas, está preparado para enviar 3 objetos (uno en forma de texto plano y dos desde una url) y movimientos aleatorios para esos objetos.
 
 \begin{enumerate}
 \item En un terminal ejecutar el servidor de prueba:

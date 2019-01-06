@@ -1,4 +1,4 @@
-\chapter{Servidor web de imágenes mediante ROS }\label{cap.camserver}
+\chapter{Servidor de imágenes con tecnologías web }\label{cap.camserver}
 En este capítulo expondrá la creación de un nuevo driver para la plataforma JdeRobot. Este driver será un servidor de imágenes, al que se ha llamado camServerWeb, obtenidas mediante una webcam (ya sea externa o interna del ordenador) de modo que cualquier aplicación externa pueda obtener las imágenes obtenidas.
 \section{Diseño}
 Este driver está diseñado con JavaScript y HTML como lenguajes de programación, y ROS como middleware para la interconexión con los diferentes clientes. A continuación se muestra un diagrama del diseño del driver:
@@ -29,8 +29,7 @@ Los parámetros configurables son los siguientes:
 \item Fuente de video. Por defecto será la primera fuente detectada por WebRTC. Este parámetro únicamente puede ser configurado mediante el menú de configuración de la interfaz gráfica.
 \end{itemize}
 
-\section{Interfaz gráfica}
-Dado que es un driver y su cometido no es mostrar nada, la interfaz gráfica que se ha creado es muy simple. En ella únicamente se mostrará si está conectado y a la IP y Puerto al que lo está. 
+\subsection{Interfaz gráfica}
 La interfaz está realizada mediante HTML y Bootstrap, siguiendo el modelo del resto de aplicaciones web de la plataforma JdeRobot.
 \begin{figure}[H]
   \begin{center}
@@ -39,7 +38,7 @@ La interfaz está realizada mediante HTML y Bootstrap, siguiendo el modelo del r
 		\label{fig.interfazcamserver}
 		\end{center}
 \end{figure}
-El único apartado destacable y el motivo que ha llevado a crear una interfaz gráfica para un driver, es el menú de configuración explicado en la sección anterior.
+La configuración se realizará gracias a un menu desplegable mediante la pulsación de un botón y una vez que se pulse el botón guardar, se almacenarán la nueva configuración para realizar las conexiones que se explicarán en las siguientes secciones:
  \begin{figure}[H]
   \begin{center}
     \includegraphics[width=0.8\textwidth]{figures/configcamserver.png}
@@ -63,10 +62,10 @@ Lo primero que se debe realizar es recopilar todos los dispositivos conectados a
 Una vez que seleccionamos el dispositivo que vamos a utilizar para adquirir las imágenes, hay que conectarse a él. Para esta conexión, volvemos a utilizar la API de webRTC, Navigator y el objeto Navigator.mediaDevices, sin embargo en esta ocasión utilizamos el método navigator.mediaDevices.getUserMedia(constraints).then(function(stream) \{\}), donde constraints define los dispositivos multimedia (en este caso el dispositivo de entrada de video escogido) y stream es el flujo de datos obtenido de ellos.
 Este flujo de datos está en el formato MediaStream, el cual no es apto para ser enviado o visualizado, por tanto es necesario realizar una reconversión. Para realizar la reconversión, vamos a utilizar el elemento de HTML canvas y el método JavaScript asociado a este elemento toDataURL(). Este método nos devuelve un data URI (URLs prefijados que permiten a los creadores de contenido incorporar pequeños archivos en línea en los documentos) que contiene una representación de la imagen en el formato especificado por el parámetro type, tomando en nuestro caso el valor "image/jpeg", para obtener las imágenes en el formato comprimido jpeg. Todo esto estará contenido en un canvas virtual, ya que no se mostrará en ningún lugar y únicamente se utilizará como pasarela entre el API de webRTC y el envío de las imágenes.
 
-\section{Conexión y transmisión de las imágenes mediante ROS}
+\section{Conexiones}
 En esta sección se explicará cómo realizar la  conexión a ROS y el posterior envío de imágenes mediante un Publisher de ROS. Como se indica en los capítulos anteriores, dado la limitación y la política de privacidad las tecnologías web, es necesario la existencia de un servidor intermedio que estará escuchando en una dirección IP y en un Puerto determinado, y hará las funciones de control de acceso y encaminamiento.
 
-\subsection{Establecer conexión con ROS}
+\subsection{Establecer conexión}
 Para realizar la conexión es necesario el uso de la biblioteca roslibjs y que se ha explicado en capítulos anteriores. Esta biblioteca nos proporciona todo el código necesario para realizar la conexión, indicándonos si se ha realizado correctamente o a si ha ocurrido algún error. Para realizar la conexión, la biblioteca roslibjs nos proporciona el objeto ROSLIB.Ros, y el método proporcionado por este objeto, ros.on. El código para establecer la conexión queda como sigue:
 \begin{lstlisting}[frame=single]
 ros = new ROSLIB.Ros();
@@ -76,17 +75,25 @@ ros = new ROSLIB.Ros({
 \end{lstlisting}
 En este código, indicaremos que la conexión se hará utilizando un canal de comunicación WebSocket, y la IP y puerto por la que se transmitirá. De esta forma ya habremos establecido la conexión ROS, pero aún deberemos definir el tipo de mensaje a enviar y a través de que etiqueta de ROS (topic de ROS) nos pueden localizar los clientes que deseen obtener lo que nuestro servidor de imágenes está transmitiendo.
 
-\subsection{Definición de los mensajes ROS}
-El tipo de mensaje que vamos a utilizar para el envío será el tipo predefinido en el API de ROS, "sensor\_msgs/CompressedImage". El motivo de la elección de este tipo es debido a que las imágenes se obtienen en formato comprimido "jpeg", tal y como se ha explicado en la sección anterior. Sin embargo, este tipo de mensaje no envía información acerca del tamaño de la imagen (altura y anchura), por lo que es necesario enviar otro mensaje adicional para completar esta información. Este mensaje de apoyo será de tipo "sensor\_msgs/CameraInfo" y transmitirá toda la información sobre la cámara (frames por segundo, altura, anchura, etc). Para definir estos dos mensajes, se utiliza el objeto proporcionado por la biblioteca roslibjs, ROSLIB.Topic. A este objete se le deben introducir como parámetros el objetos ROSLIB.Ros generado para realizar la conexión, el nombre del topic y el tipo de mensaje, por lo que generaremos nuestro Publisher para servir las imágenes (el Publisher para la información de la cámara será similar) mediante el siguiente código:
+\subsection{Mensajes}
+
+\subsubsection{Definición de la estructura de los mensajes}
+El tipo de mensaje que vamos a utilizar para el envío será el tipo predefinido en el API de ROS, "sensor\_msgs/CompressedImage". El motivo de la elección de este tipo es debido a que las imágenes se obtienen en formato comprimido "jpeg", tal y como se ha explicado en la sección anterior. Sin embargo, este tipo de mensaje no envía información acerca del tamaño de la imagen (altura y anchura), por lo que es necesario enviar otro mensaje adicional para completar esta información. Este mensaje de apoyo será de tipo "sensor\_msgs/CameraInfo" y transmitirá toda la información sobre la cámara (frames por segundo, altura, anchura, etc). Para definir estos dos mensajes, se utiliza el objeto proporcionado por la biblioteca roslibjs, ROSLIB.Topic. A este objete se le deben introducir como parámetros el objetos ROSLIB.Ros generado para realizar la conexión, el nombre del topic y el tipo de mensaje, por lo que generaremos nuestro Publisher para servir las imágenes y la información de la cámara mediante el siguiente código:
 \begin{lstlisting}[frame=single]
 var imagenTopic = new ROSLIB.Topic({
 	ros:ros, 
 	name: config.Topic, 
 	messageType : "sensor_msgs/CompressedImage Message"})
+	
+var cameraInfo = new ROSLIB.Topic({
+         ros: self.ros,
+         name : "/usb_cam/camera_info",
+         messageType: "sensor_msgs/CameraInfo"
+       })
 
 \end{lstlisting}
 
-\subsection{Creación de los mensajes y publicación}
+\subsubsection{Creación de los mensajes y publicación}
 Definidos los mensajes y establecida la conexión, el siguiente paso es transmitir los mensajes. Para ello se deben crear los mensajes con la información que deseamos transmitir con el Publisher, utilizando de nuevo un objeto definido en la biblioteca roslibjs, new ROSLIB.Message. Para crear este objeto, debemos pasar por parámetros el contenido que queramos que tenga nuestro mensaje, siempre cumpliendo las especificaciones definidas para cada tipo de mensaje escogidos anteriormente y que están definidas en la documentación de ROS  \footnote{\url{http://wiki.ros.org/common_msgs}}. En nuestro caso, para definir los dos mensajes que transmitiremos lo haremos mediante el siguiente código para el caso de la transmisión de las imágenes:
 \begin{lstlisting}[frame=single]
  var videomensaje = new ROSLIB.Message({
