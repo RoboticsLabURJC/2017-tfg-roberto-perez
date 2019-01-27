@@ -31,6 +31,20 @@
 \usepackage[acronym, nonumberlist]{glossaries}
 \makeglossaries
 
+%Para que no parta las palabras
+\pretolerance=10000
+\renewcommand{\lstlistingname}{Cuadro}
+
+
+\definecolor{backcolour}{rgb}{0.99,0.87,0.46}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+}
+
+\lstset{style=mystyle}
+
+
 \makeatletter
 \renewcommand{\@makeschapterhead}[1]{%
 %  \vspace*{50\p@}%
@@ -76,7 +90,6 @@
 \setcounter{tocdepth}{4}
 \setcounter{secnumdepth}{4}
 
-\definecolor{lightgray}{gray}{0.9}
 
 \begin{document}
 %%%%%%%%%%%%%%% Portada %%%%%%%%%%%%%%%%%%%%
