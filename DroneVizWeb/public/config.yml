@@ -1,0 +1,21 @@
+server: Ros #Ice, Ros or Simulate
+cam1serv:
+  dir: 192.168.1.110
+  port: 9090
+cam1epname: /iris_fpv_cam/cam_frontal/image_raw/compressed
+cam2serv:
+  dir: 192.168.1.110
+  port: 9090
+cam2epname: /iris_fpv_cam/cam_frontal/image_raw/compressed
+pose3dserv:
+  dir: 192.168.1.110
+  port: 9090
+pose3depname: /mavros/local_position/pose
+extraserv:
+  dir: 192.168.1.110
+  port: 9090
+extraepname: ardrone_extra
+cmdvelserv:
+  dir: 192.168.1.110
+  port: 9090
+cmdvelepname: /mavros/setpoint_raw/local

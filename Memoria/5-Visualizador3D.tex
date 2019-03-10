@@ -27,25 +27,18 @@ La parte correspondiente a la interfaz gráfica es la que da origen al visor y m
 Las conexiones ICE con el servidor incluyen varias partes claramente segmentadas. Estas partes corresponden a la petición y recepción de cada tipo de primitiva al servidor, haciendo especial hincapié en los objetos 3D que contarán con las peticiones y recepciones para mostrar nuevos objetos. El formato del archivo que admite el visor puede ser del tipo ``dae'' o ``obj''. Estos dos formatos son los más utilizados a la hora de crear objetos 3D y por tanto se considera que dando soporte a los dos formatos permite usar cualquier objeto que se desee. Los objetos se podrán mover en 3D y el visor ofrece mecanismos eficientes para que las aplicaciones, mediante  peticiones y recepciones, puedan mover los objetos existentes en la escena que se está visualizando.
 
 \section{Configuración}
-Dado que el visor en su interfaz gráfica únicamente muestra la escena donde se visualizan los objetos, es necesario utilizar una alternativa para configurar los datos de conexión (ip y puerto de escucha) y otros parámetros configurables (posición inicial de la cámara, tamaño de los puntos, tamaño de los segmentos y periodo de tiempo entre peticiones de cada tipo de objeto) antes de arrancar el visor.
-Se ha decidido usar un archivo externo con formato ``YAML'' que será leído y su información cargada por el visor al arrancar. ``YAML'' es un formato de serialización de datos muy sencillo de usar y de leer por una aplicación. Usando una única línea de código, se puede cargar y guardar en una variable la información que contiene un archivo de este tipo. El código del cuadro 5.1 muestra como realizar la lectura del fichero.
-\begin{lstlisting}[caption = Leer el fichero ``YAML'' con la configuración y guardar la información en una variable, label = cod.yaml]
-const yaml = require('js-yaml');
-const fs = require('fs');
-config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'))
-\end{lstlisting}
-Con este código, se carga el contenido del archivo ``config.yml'' (``.yml'' es la extensión de ``YAML'') en la variable ``config''.
+Dado que el visor en su interfaz gráfica únicamente muestra la escena donde se visualizan los objetos, es necesario utilizar una alternativa para configurar los datos de conexión (ip y puerto de escucha) y otros parámetros configurables (posición inicial de la cámara, tamaño de los puntos, tamaño de los segmentos y periodo de tiempo entre peticiones de cada tipo de objeto) antes de arrancar el visor. Para realizar está configuración se vuelve a utilizar un archivo en formato ``YAML'', como se explica en la sección 4.1.6 de este trabajo.
 
 Los parámetros que se pueden configurar para el visor son los siguientes:
 \begin{itemize}
-\item Dirección IP. Por defecto será ``localhost''
-\item Puerto. Por defecto será ``11000''
-\item Tiempo de refresco para la petición de puntos en milisegundos. Por defecto serán 1000 ms
-\item Tiempo de refresco para la petición de segmentos en milisegundos. Por defecto serán 1000 ms
-\item Tiempo de refresco para la petición de objetos 3D en milisegundos. Por defecto será 1 ms
-\item Tiempo de refresco para la petición del movimiento de objetos en milisegundos. Por defecto serán 1000 ms
-\item Grosor de los segmentos en pixeles. Por defecto serán 2 pixeles.
-\item Tamaño de los puntos en pixeles. Por defecto serán 8 pixeles.
+\item Dirección IP. Por defecto es ``localhost''
+\item Puerto. Por defecto es ``11000''
+\item Tiempo de refresco para la petición de puntos en milisegundos. Por defecto son 1000 ms
+\item Tiempo de refresco para la petición de segmentos en milisegundos. Por defecto son 1000 ms
+\item Tiempo de refresco para la petición de objetos 3D en milisegundos. Por defecto es 1 ms
+\item Tiempo de refresco para la petición del movimiento de objetos en milisegundos. Por defecto son 1000 ms
+\item Grosor de los segmentos en pixeles. Por defecto son 2 pixeles.
+\item Tamaño de los puntos en pixeles. Por defecto son 8 pixeles.
 \item Posición inicial de la cámara desde que se observa la escena. Está formada por las coordenadas ``x'', ``y'' y ``z'' , siendo por defecto ``50'', ``20'' y ``100'' respectivamente.
 \end{itemize}
 
