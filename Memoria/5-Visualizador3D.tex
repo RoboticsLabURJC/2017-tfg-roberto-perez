@@ -751,15 +751,20 @@ Para ejecutar 3DVizWeb y realizar pruebas, se ha creado una aplicación de test 
 #>python server_test.py
 \end{lstlisting}
 
-\item En otro terminal, instalar Electron y las dependencias del visor:
+\item En otro terminal, ejecutar 3DVizWeb
 
-\begin{lstlisting}[caption= Instalar Electron y sus dependencias, label=cod.instalarelectron]
-#>npm install
+\begin{itemize}
+\item Como aplicación web utilizando Node.js\footnote{\url{https://www.youtube.com/watch?v=1fMw6iklIUs}}
+\end{itemize}
+\begin{lstlisting}[caption= Ejecución con Node.js, label=cod.dronenodejs]
+#>node run.js
+Se arranca el navegador y se introduce la URL http://localhost:7777/
 \end{lstlisting}
-
-\item En el mismo terminal, ejecutar el visor 3D con Electron:
-
-\begin{lstlisting}[caption= Ejecutar el visor 3D mediante Electron, label=cod.tratarobjetos]
+\begin{itemize}
+\item Como aplicación de escritorio con Electron\footnote{\url{https://www.youtube.com/watch?v=-lKj8eAktMI}}
+\end{itemize}
+\begin{lstlisting}[caption= Ejecución con Electron, label=cod.droneelectron]
+#>npm install
 #>npm start
 \end{lstlisting}
 

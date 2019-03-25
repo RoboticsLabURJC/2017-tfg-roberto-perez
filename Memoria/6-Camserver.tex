@@ -139,24 +139,24 @@ Como se ha visto anteriormente, el driver puede ejecutarse a través de dos vía
 En un primer terminal o consola se debe ejecutar el servidor intermedio de ROS.
 
 \begin{lstlisting}[caption= Ejecución del servidor intermedio, label=cod.servidorintermedio]
-roslaunch rosbridge_server rosbridge_websocket.launch
+#> roslaunch rosbridge_server rosbridge_websocket.launch
 \end{lstlisting}
 En un segundo terminal se ejecutará el driver.
 \begin{itemize}
 \item 
-Como aplicación web utilizando Node.js
+Como aplicación web utilizando Node.js\footnote{\url{https://www.youtube.com/watch?v=taQzWUbYp-s}}
 \end{itemize}
 \begin{lstlisting}[caption= Ejecución con Node.js, label=cod.nodejs]
-node run.js
+#>node run.js
 Se arranca el navegador y se introduce la URL http://localhost:7777/
 \end{lstlisting}
 \begin{itemize}
 \item 
-Como aplicación de escritorio con Electron
+Como aplicación de escritorio con Electron\footnote{\url{https://www.youtube.com/watch?v=3PTJyvtEaDE}}
 \end{itemize}
 \begin{lstlisting}[caption= Ejecución con Electron, label=cod.electron]
-npm install
-npm start
+#>npm install
+#>npm start
 \end{lstlisting}
 En ambos casos debemos configurar el driver para que se conecte con el servidor intermedio, en la imagen 4.5 muestra una posible configuración del driver.
 \begin{figure}[H]
