@@ -1,11 +1,11 @@
 Server: "localhost"
 Port: "11000"
-updatePoints: 1000 #miliseconds
+updatePoints: 1500 #miliseconds
 updateSegments: 1000 #miliseconds
 updateModels: 1000 #miliseconds
-updatePose3D: 1000 #miliseconds
-linewidth: 2 #width of the line
-pointsize: 8 #size of the point
+updatePose3D: 0 #miliseconds
+linewidth: 4 #width of the line
+pointsize: 12 #size of the point
 camera: #camera position
   x: 50
   y: 20

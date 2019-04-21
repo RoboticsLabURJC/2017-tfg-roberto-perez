@@ -1,6 +1,7 @@
 var camera, scene, renderer, controls;
 var  axes, grid, particles;
 var id_list = ["points","line"];
+var id_obj = [];
 var rotationx = 0.0;
 var rotationy = 0.0;
 var toDegrees = 180/Math.PI;
@@ -61,8 +62,8 @@ var toDegrees = 180/Math.PI;
 						new THREE.Vector3(segment.seg.fromPoint.x,segment.seg.fromPoint.z,segment.seg.fromPoint.y),
 						new THREE.Vector3(segment.seg.toPoint.x,segment.seg.toPoint.z,segment.seg.toPoint.y));
 				var material = new THREE.LineBasicMaterial();
-				material.color.setRGB(segment.c.r,segment.c.g, segment.c.b);
 				material.linewidth = config.linewidth;
+				material.color.setRGB(segment.c.r,segment.c.g, segment.c.b);
 				line = new THREE.Line(geometry,material);
 				line.name = "line";
 				scene.add(line);
@@ -74,15 +75,27 @@ var toDegrees = 180/Math.PI;
 				scene.add(grid);
 			}
 
-			function deleteObj(){
-				for (i = 0; i < id_list.length; i++){
-					var selectedObject = scene.getObjectByName(id_list[i]);
+			function deleteObj(id){
+				if (id == ""){
+					delete_list = id_list;
+					id_list = ["points","line"];
+					id_obj = [];
+				} else if (id == "obj"){
+						delete_list = id_obj;
+						id_list = ["points","line"];
+						id_obj = []
+				} else {
+						delete_list = [id];
+				}
+				for (i = 0; i < delete_list.length; i++){
+					var selectedObject = scene.getObjectByName(delete_list[i]);
 					while (selectedObject != null) {
 						scene.remove(selectedObject);
-						selectedObject = scene.getObjectByName(id_list[i]);
+						selectedObject = scene.getObjectByName(delete_list[i]);
 					}
 				}
 			}
+
 
 			function addObj(obj,pos){
 				var type = obj.obj.split(":");
@@ -109,8 +122,9 @@ var toDegrees = 180/Math.PI;
 					if (obj.format == "dae") object = object.scene;
 					object.name = obj.id;
 					id_list.push(obj.id);
+					id_obj.push(obj.id);
 					object.position.set(pose3d.x,pose3d.y,pose3d.z);
-					object.rotation.set(pose3d.rx*toDegrees,pose3d.ry * toDegrees, pose3d.rz * toDegrees);
+					object.rotation.set(pose3d.rx, pose3d.ry ,pose3d.rz);
 					object.scale.set(scale,scale,scale);
 					scene.add( object );
 				} );
@@ -119,7 +133,7 @@ var toDegrees = 180/Math.PI;
 			function moveObj(pose3d){
 				selectedObject = scene.getObjectByName(pose3d.id);
 				selectedObject.position.set(pose3d.x,pose3d.y,pose3d.z);
-				selectedObject.rotation.set(pose3d.rx*toDegrees,pose3d.ry * toDegrees, pose3d.rz * toDegrees);
+				selectedObject.rotation.set(pose3d.rx, pose3d.ry,pose3d.rz);
 			}
 
 

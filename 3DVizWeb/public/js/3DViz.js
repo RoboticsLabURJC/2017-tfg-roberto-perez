@@ -1,4 +1,4 @@
-let config = {};
+var config = {};
 var w;
 var lineInterval, pointInterval, objInterval;
 var posInterval = null;
@@ -23,10 +23,12 @@ try{
 } catch (e) {
 	config.Server = "localhost";
 	config.Port = "11000";
-	config.updatePoints= 10
-	config.updateSegments= 10
-	config.linewidth= 2
-	config.pointsize= 8
+	config.updatePoints= 1000;
+	config.updateSegments= 1000;
+	config.updatePose3D = 0;
+	config.updateModels = 1000;
+	config.linewidth= 4
+	config.pointsize= 12
 	config.camera = {}
 	config.camera.x = 100
 	config.camera.y = 50
@@ -120,25 +122,37 @@ try{
 
 		function getData (){
 			w.onmessage = function(event) {
-				if (event.data.func == "drawLine"){
-					if (event.data.segments.refresh & (event.data.segments.buffer.length !=0)){
-						deleteObj();
-					}
-						segments = event.data.segments.buffer;
-						for (var i = 0; i < segments.length; i+=1) {
-		        	addLine(segments[i], "segments");
+				if (event.data.func == "drawPoint"){
+					if (event.data.points.buffer.length !=0){
+						if (event.data.points.refresh == "all"){
+							deleteObj("");
+						} else if ((event.data.points.refresh == "part")) {
+							deleteObj("points");
 						}
-				} else if (event.data.func == "drawPoint"){
-					if (event.data.points.refresh & (event.data.points.buffer.length != 0)){
-						deleteObj();
 					}
 					points = event.data.points.buffer;
 				for (var i = 0; i < points.length; i+=1) {
         	addPoint(points[i]);
 				}
+				} else if (event.data.func == "drawLine"){
+					if (event.data.segments.buffer.length !=0){
+						if (event.data.segments.refresh == "all"){
+							deleteObj("");
+						} else if ((event.data.segments.refresh == "part")) {
+							deleteObj("line");
+						}
+					}
+						segments = event.data.segments.buffer;
+						for (var i = 0; i < segments.length; i+=1) {
+		        	addLine(segments[i], "segments");
+						}
 			} else if (event.data.func == "drawObj") {
-				if (event.data.refresh & (event.data.obj != "")){
-					deleteObj();
+				if (event.data.obj.obj !=""){
+					if (event.data.obj.refresh == "all"){
+						deleteObj("");
+					} else if ((event.data.obj.refresh == "part")) {
+						deleteObj("obj");
+					}
 				}
 				cont += 1
 				var pos = getPose3D(event.data.obj);

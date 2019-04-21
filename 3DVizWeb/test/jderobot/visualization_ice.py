@@ -123,7 +123,7 @@ if '_t_File' not in _M_jderobot.__dict__:
 if 'bufferSegments' not in _M_jderobot.__dict__:
     _M_jderobot.bufferSegments = Ice.createTempClass()
     class bufferSegments(object):
-        def __init__(self, buffer=None, refresh=False):
+        def __init__(self, buffer=None, refresh=''):
             self.buffer = buffer
             self.refresh = refresh
 
@@ -149,7 +149,7 @@ if 'bufferSegments' not in _M_jderobot.__dict__:
 
     _M_jderobot._t_bufferSegments = IcePy.defineStruct('::jderobot::bufferSegments', bufferSegments, (), (
         ('buffer', (), _M_jderobot._t_Segments),
-        ('refresh', (), IcePy._t_bool)
+        ('refresh', (), IcePy._t_string)
     ))
 
     _M_jderobot.bufferSegments = bufferSegments
@@ -158,7 +158,7 @@ if 'bufferSegments' not in _M_jderobot.__dict__:
 if 'bufferPoints' not in _M_jderobot.__dict__:
     _M_jderobot.bufferPoints = Ice.createTempClass()
     class bufferPoints(object):
-        def __init__(self, buffer=None, refresh=False):
+        def __init__(self, buffer=None, refresh=''):
             self.buffer = buffer
             self.refresh = refresh
 
@@ -184,7 +184,7 @@ if 'bufferPoints' not in _M_jderobot.__dict__:
 
     _M_jderobot._t_bufferPoints = IcePy.defineStruct('::jderobot::bufferPoints', bufferPoints, (), (
         ('buffer', (), _M_jderobot._t_Points),
-        ('refresh', (), IcePy._t_bool)
+        ('refresh', (), IcePy._t_string)
     ))
 
     _M_jderobot.bufferPoints = bufferPoints
@@ -193,7 +193,7 @@ if 'bufferPoints' not in _M_jderobot.__dict__:
 if 'object3d' not in _M_jderobot.__dict__:
     _M_jderobot.object3d = Ice.createTempClass()
     class object3d(object):
-        def __init__(self, obj='', id='', format='', scale=0.0, pos=None, refresh=False):
+        def __init__(self, obj='', id='', format='', scale=0.0, pos=None, refresh=''):
             self.obj = obj
             self.id = id
             self.format = format
@@ -235,7 +235,7 @@ if 'object3d' not in _M_jderobot.__dict__:
         ('format', (), IcePy._t_string),
         ('scale', (), IcePy._t_float),
         ('pos', (), _M_jderobot._t_Pose3DData),
-        ('refresh', (), IcePy._t_bool)
+        ('refresh', (), IcePy._t_string)
     ))
 
     _M_jderobot.object3d = object3d
@@ -299,13 +299,7 @@ if 'Visualization' not in _M_jderobot.__dict__:
             return '::jderobot::Visualization'
         ice_staticId = staticmethod(ice_staticId)
 
-        def drawSegment(self, bseg, current=None):
-            pass
-
         def getSegment(self, current=None):
-            pass
-
-        def drawPoint(self, bpnts, current=None):
             pass
 
         def getPoints(self, current=None):
@@ -317,9 +311,6 @@ if 'Visualization' not in _M_jderobot.__dict__:
         def getPoseObj3DData(self, current=None):
             pass
 
-        def clearAll(self, current=None):
-            pass
-
         def __str__(self):
             return IcePy.stringify(self, _M_jderobot._t_Visualization)
 
@@ -327,15 +318,6 @@ if 'Visualization' not in _M_jderobot.__dict__:
 
     _M_jderobot.VisualizationPrx = Ice.createTempClass()
     class VisualizationPrx(Ice.ObjectPrx):
-
-        def drawSegment(self, bseg, _ctx=None):
-            return _M_jderobot.Visualization._op_drawSegment.invoke(self, ((bseg, ), _ctx))
-
-        def begin_drawSegment(self, bseg, _response=None, _ex=None, _sent=None, _ctx=None):
-            return _M_jderobot.Visualization._op_drawSegment.begin(self, ((bseg, ), _response, _ex, _sent, _ctx))
-
-        def end_drawSegment(self, _r):
-            return _M_jderobot.Visualization._op_drawSegment.end(self, _r)
 
         def getSegment(self, _ctx=None):
             return _M_jderobot.Visualization._op_getSegment.invoke(self, ((), _ctx))
@@ -345,15 +327,6 @@ if 'Visualization' not in _M_jderobot.__dict__:
 
         def end_getSegment(self, _r):
             return _M_jderobot.Visualization._op_getSegment.end(self, _r)
-
-        def drawPoint(self, bpnts, _ctx=None):
-            return _M_jderobot.Visualization._op_drawPoint.invoke(self, ((bpnts, ), _ctx))
-
-        def begin_drawPoint(self, bpnts, _response=None, _ex=None, _sent=None, _ctx=None):
-            return _M_jderobot.Visualization._op_drawPoint.begin(self, ((bpnts, ), _response, _ex, _sent, _ctx))
-
-        def end_drawPoint(self, _r):
-            return _M_jderobot.Visualization._op_drawPoint.end(self, _r)
 
         def getPoints(self, _ctx=None):
             return _M_jderobot.Visualization._op_getPoints.invoke(self, ((), _ctx))
@@ -382,15 +355,6 @@ if 'Visualization' not in _M_jderobot.__dict__:
         def end_getPoseObj3DData(self, _r):
             return _M_jderobot.Visualization._op_getPoseObj3DData.end(self, _r)
 
-        def clearAll(self, _ctx=None):
-            return _M_jderobot.Visualization._op_clearAll.invoke(self, ((), _ctx))
-
-        def begin_clearAll(self, _response=None, _ex=None, _sent=None, _ctx=None):
-            return _M_jderobot.Visualization._op_clearAll.begin(self, ((), _response, _ex, _sent, _ctx))
-
-        def end_clearAll(self, _r):
-            return _M_jderobot.Visualization._op_clearAll.end(self, _r)
-
         def checkedCast(proxy, facetOrCtx=None, _ctx=None):
             return _M_jderobot.VisualizationPrx.ice_checkedCast(proxy, '::jderobot::Visualization', facetOrCtx, _ctx)
         checkedCast = staticmethod(checkedCast)
@@ -408,13 +372,10 @@ if 'Visualization' not in _M_jderobot.__dict__:
     _M_jderobot._t_Visualization = IcePy.defineClass('::jderobot::Visualization', Visualization, -1, (), True, False, None, (), ())
     Visualization._ice_type = _M_jderobot._t_Visualization
 
-    Visualization._op_drawSegment = IcePy.Operation('drawSegment', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_jderobot._t_bufferSegments, False, 0),), (), None, ())
     Visualization._op_getSegment = IcePy.Operation('getSegment', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (), (), ((), _M_jderobot._t_bufferSegments, False, 0), ())
-    Visualization._op_drawPoint = IcePy.Operation('drawPoint', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), _M_jderobot._t_bufferPoints, False, 0),), (), None, ())
     Visualization._op_getPoints = IcePy.Operation('getPoints', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (), (), ((), _M_jderobot._t_bufferPoints, False, 0), ())
     Visualization._op_getObj3D = IcePy.Operation('getObj3D', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (((), IcePy._t_string, False, 0),), (), ((), _M_jderobot._t_object3d, False, 0), ())
     Visualization._op_getPoseObj3DData = IcePy.Operation('getPoseObj3DData', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (), (), ((), _M_jderobot._t_bufferPoseObj3D, False, 0), ())
-    Visualization._op_clearAll = IcePy.Operation('clearAll', Ice.OperationMode.Normal, Ice.OperationMode.Normal, False, None, (), (), (), None, ())
 
     _M_jderobot.Visualization = Visualization
     del Visualization

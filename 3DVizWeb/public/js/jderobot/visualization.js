@@ -82,18 +82,18 @@
         function(buffer, refresh)
         {
             this.buffer = buffer !== undefined ? buffer : null;
-            this.refresh = refresh !== undefined ? refresh : false;
+            this.refresh = refresh !== undefined ? refresh : "";
         },
         false,
         function(__os)
         {
             jderobot.SegmentsHelper.write(__os, this.buffer);
-            __os.writeBool(this.refresh);
+            __os.writeString(this.refresh);
         },
         function(__is)
         {
             this.buffer = jderobot.SegmentsHelper.read(__is);
-            this.refresh = __is.readBool();
+            this.refresh = __is.readString();
         },
         2,
         false);
@@ -102,54 +102,54 @@
         function(buffer, refresh)
         {
             this.buffer = buffer !== undefined ? buffer : null;
-            this.refresh = refresh !== undefined ? refresh : false;
+            this.refresh = refresh !== undefined ? refresh : "";
         },
         false,
         function(__os)
         {
             jderobot.PointsHelper.write(__os, this.buffer);
-            __os.writeBool(this.refresh);
+            __os.writeString(this.refresh);
         },
         function(__is)
         {
             this.buffer = jderobot.PointsHelper.read(__is);
-            this.refresh = __is.readBool();
+            this.refresh = __is.readString();
         },
         2,
         false);
 
-        jderobot.object3d = Slice.defineStruct(
-            function(obj, id, format, scale, pos, refresh)
-            {
-                this.obj = obj !== undefined ? obj : "";
-                this.id = id !== undefined ? id : "";
-                this.format = format !== undefined ? format : "";
-                this.scale = scale !== undefined ? scale : 0.0;
-                this.pos = pos !== undefined ? pos : null;
-                this.refresh = refresh !== undefined ? refresh : false;
-            },
-            false,
-            function(__os)
-            {
-                __os.writeString(this.obj);
-                __os.writeString(this.id);
-                __os.writeString(this.format);
-                __os.writeFloat(this.scale);
-                __os.writeObject(this.pos);
-                __os.writeBool(this.refresh);
-            },
-            function(__is)
-            {
-                var self = this;
-                this.obj = __is.readString();
-                this.id = __is.readString();
-                this.format = __is.readString();
-                this.scale = __is.readFloat();
-                __is.readObject(function(__o){ self.pos = __o; }, jderobot.Pose3DData);
-                this.refresh = __is.readBool();
-            },
-            9,
-            false);
+    jderobot.object3d = Slice.defineStruct(
+        function(obj, id, format, scale, pos, refresh)
+        {
+            this.obj = obj !== undefined ? obj : "";
+            this.id = id !== undefined ? id : "";
+            this.format = format !== undefined ? format : "";
+            this.scale = scale !== undefined ? scale : 0.0;
+            this.pos = pos !== undefined ? pos : null;
+            this.refresh = refresh !== undefined ? refresh : "";
+        },
+        false,
+        function(__os)
+        {
+            __os.writeString(this.obj);
+            __os.writeString(this.id);
+            __os.writeString(this.format);
+            __os.writeFloat(this.scale);
+            __os.writeObject(this.pos);
+            __os.writeString(this.refresh);
+        },
+        function(__is)
+        {
+            var self = this;
+            this.obj = __is.readString();
+            this.id = __is.readString();
+            this.format = __is.readString();
+            this.scale = __is.readFloat();
+            __is.readObject(function(__o){ self.pos = __o; }, jderobot.Pose3DData);
+            this.refresh = __is.readString();
+        },
+        9,
+        false);
 
         jderobot.PoseObj3D = Slice.defineStruct(
             function(id, pos)
