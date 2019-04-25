@@ -1,5 +1,5 @@
 \chapter{Servidor de imágenes con tecnologías web }\label{cap.camserver}
-En este capítulo se expone la creación de un nuevo driver para la plataforma JdeRobot. Este driver es un servidor de imágenes, al que se ha llamado CamServerWeb, obtenidas por una webcam (ya sea externa o interna del ordenador) de modo que cualquier aplicación externa pueda obtener las imágenes obtenidas.
+En este capítulo se expone la creación de un nuevo driver para la plataforma JdeRobot. Este driver es un servidor de imágenes, al que se ha llamado CamServerWeb\footnote{\url{https://github.com/RoboticsURJC-students/2017-tfg-roberto-perez/tree/master/camserverWeb}}, obtenidas por una webcam (ya sea externa o interna del ordenador) de modo que cualquier aplicación externa pueda obtener las imágenes obtenidas.
 \section{Diseño}
 Este driver está diseñado con JavaScript y HTML como lenguajes de programación, WebRTC como biblioteca de captura de imágenes y ROS como middleware para la interconexión con los diferentes clientes. El driver puede ser ejecutado como una aplicación de escritorio usando el \textit{framework} Electron o como una página web usando un navegador. Gracias a esto se permite la ejecución multiplataforma sin necesidad de realizar modificaciones, lo que provee a este driver de una gran ventaja respecto a los tradicionales que se tenían, que están desarrollados para una única plataforma.  En la figura 6.1 se muestra el esquema de funcionamiento del driver.
 \begin{figure}[H]
@@ -139,7 +139,7 @@ Como se ha visto anteriormente, el driver puede ejecutarse a través de dos vía
 En un primer terminal o consola se debe ejecutar el servidor intermedio de ROS.
 
 \begin{lstlisting}[caption= Ejecución del servidor intermedio, label=cod.servidorintermedio]
-#> roslaunch rosbridge_server rosbridge_websocket.launch
+#>roslaunch rosbridge_server rosbridge_websocket.launch
 \end{lstlisting}
 En un segundo terminal se ejecutará el driver.
 \begin{itemize}

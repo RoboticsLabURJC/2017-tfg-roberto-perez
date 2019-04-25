@@ -2,7 +2,7 @@
 En este capítulo se va a explicar cómo se han modificado los visores con tecnologías web existentes en la plataforma JdeRobot y desarrollados por Aitor Martínez en su TFG\footnote{\url{https://jderobot.org/Aitormf-tfg}}, para que utilicen el \textit{middleware} de comunicación ROS, además de ICE. Por otro lado, se les añade la posibilidad de ser ejecutados mediante el entorno Electron, además de en un navegador web. Estos tres visores son \texttt{CamVizWeb}, \texttt{TurtleBotVizWeb} y \texttt{DroneVizWeb}.
 
 \section{CamVizWeb}
-Se trata de un visor de imágenes desarrollado con tecnologías web, que usa los middleware de comunicación ICE y ROS  y puede ser ejecutado con Electron o en un navegador web.
+Se trata de un visor de imágenes desarrollado con tecnologías web, que usa los middleware de comunicación ICE y ROS  y puede ser ejecutado con Electron o en un navegador web\footnote{\url{https://github.com/RoboticsURJC-students/2017-tfg-roberto-perez/tree/master/camVizWeb}}.
 
 \subsection{Diseño}
 El visor previamente solo contaba con el \textit{middleware} ICE para realizar la comunicación, por lo que su funcionalidad estaba limitada a los drivers que son capaces de comunicarse de esta forma. Sin embargo, con esta extensión, se amplía el abanico de drivers que pueden conectarse al permitir la utilización tanto de ICE como de ROS. La Figura 4.1 muestra el diagrama de bloques tras desarrollar la comunicación mediante las dos vías.
@@ -38,7 +38,7 @@ Esta modificación se ha realizado sobre el menú de configuración para que cua
 
 En la Figura 4.3 se muestra la interfaz gráfica del visor y en la Figura 4.4 se muestra el menú de configuración.
 
-\begin{figure}
+\begin{figure}[htb]
 \centering
   \begin{minipage}{0.45\textwidth}
     \centering
@@ -169,13 +169,13 @@ Como se ha indicado en la sección 4.1.1, el visor puede ser ejecutado a través
 En un primer terminal o consola se debe ejecutar el servidor intermedio de ROS que se puede ver en el esquema.
 
 \begin{lstlisting}[caption= Ejecución del servidor intermedio, label=cod.servidorintermediocamviz]
-#> roslaunch rosbridge_server rosbridge_websocket.launch
+#>roslaunch rosbridge_server rosbridge_websocket.launch
 \end{lstlisting}
 
 En un segundo terminal se ejecuta el driver.
 
 \begin{lstlisting}[caption= Ejecución del driver de ROS label=cod.driverusbcam]
-#> roslaunch usb_cam usb_cam.launch
+#>roslaunch usb_cam usb_cam.launch
 \end{lstlisting}
 
 En el tercer terminal se ejecuta CamVizWeb
@@ -209,7 +209,7 @@ Como aplicación de escritorio con Electron\footnote{\url{https://www.youtube.co
 \end{figure}
 
 \section{TurtleBotVizWeb}
-Se trata de un visor y teleoperador para robots del tipo TurtleBot, desarrollado con tecnologías web, que usa los middleware de comunicación ICE y ROS y puede ser ejecutado con Electron o en un navegador web.
+Se trata de un visor y teleoperador para robots del tipo TurtleBot, desarrollado con tecnologías web, que usa los middleware de comunicación ICE y ROS y puede ser ejecutado con Electron o en un navegador web\footnote{\url{https://github.com/RoboticsURJC-students/2017-tfg-roberto-perez/tree/master/TurtlebotVizWeb}}.
 
 \subsection{Diseño}
 La versión previa de esta herramienta solo contaba con ICE como \textit{middleware} de comunicación, esto limitaba el uso de esta herramienta a TurtleBots que fueran capaces de comunicarse con ICE. Sin embargo, ahora será capaz también de conectarse con aquellos que se comuniquen mediante ROS. La figura 4.6 muestra el diagrama de bloques del visor tras la mejora realizada en este trabajo.
@@ -245,7 +245,7 @@ La interfaz gráfica se mantiene la existente previamente realizando las modific
 
 Esta interfaz se puede visualizar en la figura 4.8 y en la figura 4.9 se muestra el nuevo menú de configuración.
 
-\begin{figure}
+\begin{figure}[htb]
 \centering
   \begin{minipage}{0.45\textwidth}
     \centering
@@ -309,7 +309,7 @@ cameraright.connect();
 pose3d.connect();
 ...
 \end{lstlisting}
-Las cinco primeras líneaa de código corresponden a la creación de los objetos. Su número coincide con los mensajes que se van a recibir y enviar. Las siguientes cinco líneas corresponden a la invocación del método para inicializar la conexión.
+Las cinco primeras líneas de código corresponden a la creación de los objetos. Su número coincide con los mensajes que se van a recibir y enviar. Las siguientes cinco líneas corresponden a la invocación del método para inicializar la conexión.
 
 \subsubsection{Estructura de los mensajes}
 Se van a utilizar cuatro mensajes de los tipos predeterminados de ROS y definidos en su documentación\footnote{\url{http://wiki.ros.org/common_msgs}}. Para obtener las imágenes de las cámaras, al igual que en el visor CamVizWeb, se va a usar el tipo \texttt{sensor\_msgs/CompressedImage} y se incluye dentro del método \texttt{connect} de \texttt{API.CameraRos}.
@@ -581,11 +581,45 @@ Como aplicación de escritorio con Electron\footnote{\url{https://www.youtube.co
 		\end{center}
 \end{figure}
 
+Este driver también se ha probado con un TurtleBot real\footnote{\url{https://www.youtube.com/watch?v=U71PYPtEZIo}}. Para ello se han seguido los siguientes pasos:
+
+En un primer terminal o consola se debe ejecutar el servidor intermedio de ROS que se puede ver en el esquema.
+\begin{lstlisting}[caption= Ejecución del servidor intermedio, label=cod.servidorintermedioTurtleBot]
+#>roslaunch rosbridge_server rosbridge_websocket.launch
+\end{lstlisting}
+
+En un segundo terminal se ejecuta los drivers de ROS necesario para controlar los motores del TurtleBot y obtener el sensor láser.
+
+\begin{lstlisting}[caption= Ejecución de los drivers para los motores y el láser]
+#>roslaunch turtlebot-hokuyo.launch
+\end{lstlisting}
+
+En un tercer terminal se ejecuta los drivers de ROS para obtener las imágenes de las cámaras incorporadas en el TurtleBot.
+
+\begin{lstlisting}[caption= Ejecución del driver de ROS para las cámaras]
+#>roslaunch usb_cam usb_cam.launch
+\end{lstlisting}
+
+En el cuarto terminal se ejecuta TurtleBotVizWeb.
+
+\begin{lstlisting}[caption= Ejecución con Electron, label=cod.turtleelectronreal]
+#>npm install
+#>npm start
+\end{lstlisting}
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{figures/Turtlebotreal.png}
+    		\caption{TurtleBotVizWeb conectado a un TurtleBot físico}
+		\label{fig.TurtleBotvizreal}
+		\end{center}
+\end{figure}
+
 \section{DroneVizWeb}
-Se trata de un visor y teleoperador para Drones desarrollado con tecnologías web, que usa los middleware de comunicación ICE y ROS y puede ser ejecutado con Electron o en un navegador web.
+Se trata de un visor y teleoperador para Drones desarrollado con tecnologías web, que usa los middleware de comunicación ICE y ROS y puede ser ejecutado con Electron o en un navegador web\footnote{\url{https://github.com/RoboticsURJC-students/2017-tfg-roberto-perez/tree/master/DroneVizWeb}}.
 
 \subsection{Diseño}
-Al igual que en los visores anteriores, la versión previa de esta herramienta solo contaba con ICE como \textit{middleware} de comunicación. Ahora es capaz también de conectarse con Drones que se comuniquen mediante ROS y no solo mediante ICE. Para lograr la conectividad con el drone mediante ROS ha sido necesaria la utilización de MavROS\footnote{\url{http://wiki.ros.org/mavros}} que es un paquete que proporciona una interfaz para el control de drones utilizando el protocolo MAVLink\footnote{\url{https://mavlink.io/en/}}. La figura 4.16 muestra el diagrama de bloques del visor tras la mejora realizada en este trabajo.
+Al igual que en los visores anteriores, la versión previa de esta herramienta solo contaba con ICE como \textit{middleware} de comunicación. Ahora es capaz también de conectarse con Drones que se comuniquen mediante ROS y no solo mediante ICE. Para lograr la conectividad con el drone mediante ROS ha sido necesaria la utilización de MavROS\footnote{\url{http://wiki.ros.org/mavros}} que es un paquete que proporciona una interfaz para el control de drones utilizando el protocolo MAVLink\footnote{\url{https://mavlink.io/en/}}. La figura 4.17 muestra el diagrama de bloques del visor tras la mejora realizada en este trabajo.
 
 \begin{figure}[H]
   \begin{center}
@@ -595,7 +629,7 @@ Al igual que en los visores anteriores, la versión previa de esta herramienta s
 		\end{center}
 \end{figure}
 
-En la figura 4.17 muestra la estructura interna de la aplicación previa de una manera detallada tras realizar la modificación.
+En la figura 4.18 muestra la estructura interna de la aplicación previa de una manera detallada tras realizar la modificación.
 
 \begin{figure}[H]
   \begin{center}
@@ -614,8 +648,8 @@ En el caso de ROS, se utiliza los \textit{subscribe} para recibir los mensajes p
 Por otro lado, al igual que para el resto de herramientas que componen este trabajo, se le añade la posibilidad de ejecutarse mediante el entorno Electron y la configuración previa mediante un archivo externo en formato ``YAML''.
 
 \subsection{Interfaz gráfica}
-Se mantiene la interfaz gráfica existente en la versión anterior de la herramienta. Esta interfaz cuenta con un elemento \texttt{Canvas} de HTML5 donde se muestra la imagen procedente de la cámara, sobre este elemento se incorporan tres botones, el primer botón es el utilizado para indicar el arranque y despegue, el segundo botón es el que se utiliza para indicar el aterrizaje y el ultimo botón se utiliza para solicitar el cambio de cámara a mostrar (si en ese momento se muestra la cámara frontal, se cambia a la inferior y viceversa). Por otro lado, dentro de este elemento también se incorporan dos \textit{joysticks} para controlar el drone, estos \textit{joysticks} están creados usando también elementos \texttt{Canvas}, siendo el \textit{joystick} izquierdo el que controla la velocidad y el derecho el que controla la altura del drone. La interfaz gráfica cuenta con otro elemento \texttt{Canvas} donde se muestra la representación tridimensional del drone y su movimiento, así como tres botones para comenzar la conexión, para parar la conexión y para abrir la ventana con el menú para realizar la configuración en tiempo de ejecución. En la figura 4.18 se muestra la interfaz gráfica utilizada. Para poder configurar la conexión mediante ROS, se vuelve a utilizar lo indicado en la sección 4.2.2. En la figura 4.19 se muestra el menú de configuración para realizar la configuración en tiempo de ejecución.
 
+Se mantiene la interfaz gráfica existente en la versión anterior de la herramienta. Esta interfaz cuenta con un elemento \texttt{Canvas} de HTML5 donde se muestra la imagen procedente de la cámara, sobre este elemento se incorporan tres botones, el primer botón es el utilizado para indicar el arranque y despegue, el segundo botón es el que se utiliza para indicar el aterrizaje y el ultimo botón se utiliza para solicitar el cambio de cámara a mostrar (si en ese momento se muestra la cámara frontal, se cambia a la inferior y viceversa). Por otro lado, dentro de este elemento también se incorporan dos \textit{joysticks} para controlar el drone, estos \textit{joysticks} están creados usando también elementos \texttt{Canvas}, siendo el \textit{joystick} izquierdo el que controla la velocidad y el derecho el que controla la altura del drone. La interfaz gráfica cuenta con otro elemento \texttt{Canvas} donde se muestra la representación tridimensional del drone y su movimiento, así como tres botones para comenzar la conexión, para parar la conexión y para abrir la ventana con el menú para realizar la configuración en tiempo de ejecución.
 \begin{figure}[htb]
 \centering
   \begin{minipage}{0.45\textwidth}
@@ -633,6 +667,8 @@ Se mantiene la interfaz gráfica existente en la versión anterior de la herrami
   \end{minipage}
 \end{figure}
 
+En la figura 4.19 se muestra la interfaz gráfica utilizada. Para poder configurar la conexión mediante ROS, se vuelve a utilizar lo indicado en la sección 4.2.2. En la figura 4.20 se muestra el menú de configuración para realizar la configuración en tiempo de ejecución.
+
 \subsection{Conexiones}
 
 Con la modificación realizada la herramienta permite el uso de los middleware ICE y ROS para realizar las comunicaciones con un funcionamiento igual de eficiente.
@@ -641,7 +677,7 @@ Al igual que en el visor TurtleBotVizWeb, se reutilza el \textit{API} de ICE par
 
 \subsubsection{Establecimiento de las conexiones}
 
-Por cada tipo de mensaje que se envía o se recibe se realiza una conexión, en el caso de este visor simultáneamente se tendrán activas 5 conexiones (dos cámaras, posición, motores y extra) como se ha podido ver en la figura 4.17.
+Por cada tipo de mensaje que se envía o se recibe se realiza una conexión, en el caso de este visor simultáneamente se tendrán activas 5 conexiones (dos cámaras, posición, motores y extra) como se ha podido ver en la figura 4.18.
 
 Dado que se establece la conexión de la misma forma que la explicada en la sección 4.2.3.1, no se va a profundizar más al respecto, simplemente indicar que los objetos creados en la \texttt{API} para realizar las conexiones en esta ocasión son \texttt{API.CameraRos, API.MotorsRos, API.ExtraRos y API.Pose3DRos} que corresponden con la conexión para la cámara, para el control de los motores, para el arranque, despegue y aterrizaje, y para la posición del drone respectivamente, con el método \texttt{connect} asociado a cada objeto y explicado en la sección anteriormente referenciada.
 
@@ -649,7 +685,7 @@ Dado que se establece la conexión de la misma forma que la explicada en la secc
 
 Para este visor se van a utilizar los mensajes predeterminados de ROS para obtener las imágenes de la cámara y obtener la posición. Por otro lado, para transmitir las peticiones de arranque, despegue, aterrizaje y el control de los motores se utilizan los mensajes facilitados en el paquete MavROS\footnote{\url{http://docs.ros.org/melodic/api/mavros_msgs/html/index-msg.html}}. Para definir los mensajes se va a utilizar los mismos métodos que se usan en las herramientas anteriores.
 
-El mensaje que transmite las imágenes de las cámaras son del tipo \texttt{sensor\_msgs/CompressedImage} y se define con el código que se muestra en el cuadro 4.23. Esta definición está incluida dentro del método \texttt{connect} del objeto \texttt{API.CameraRos}.
+El mensaje que transmite las imágenes de las cámaras son del tipo \texttt{sensor\_msgs/CompressedImage} y se define con el código que se muestra en el cuadro 4.27. Esta definición está incluida dentro del método \texttt{connect} del objeto \texttt{API.CameraRos}.
 
 \begin{lstlisting}[caption= Definición del mensaje para la información de las cámaras, label=cod.mensajecamdrone]
 self.roscam = new ROSLIB.Topic({
@@ -659,7 +695,7 @@ self.roscam = new ROSLIB.Topic({
 });
 \end{lstlisting}
 
-La información sobre el posicionamiento del drone se transmite mediante \texttt{nav\_msgs/Odometry}, que transmite la posición mediante la clase ``Pose3D''. En el cuadro 4.24 se muestra la definición de este mensaje que forma parte del método \texttt{connect} del objeto \texttt{API.Pose3DRos}
+La información sobre el posicionamiento del drone se transmite mediante \texttt{nav\_msgs/Odometry}, que transmite la posición mediante la clase ``Pose3D''. En el cuadro 4.28 se muestra la definición de este mensaje que forma parte del método \texttt{connect} del objeto \texttt{API.Pose3DRos}
 
 \begin{lstlisting}[caption= Definición del mensaje para obtener el posicionamiento del drone, label=cod.mensajeposedrone]
 self.rospose = new ROSLIB.Topic({
@@ -669,7 +705,7 @@ self.rospose = new ROSLIB.Topic({
 });
 \end{lstlisting}
 
-La transmisión del control de los motores se envía mediante el tipo facilitado en el paquete MavROS \texttt{mavros\_msgs/PositionTarget}. Este mensaje transmite la información acerca de la posición para la coordenada ``x'', ``y'' y ``z'', la velocidad lineal en cada una de estos ejes de coordenadas, la aceleración en cada eje y la rotación entorno al eje ``y''. Con este mensaje se puede enviar toda la información para teleoperar un drone. Además este mensaje incluye una marca de tiempo para sincronizar el drone con el teleoperador. Como en los casos anteriores, esta definición se incluye en el método \texttt{connect} del objeto \texttt{API.MotorsRos} y se puede ver en el cuadro 4.25.
+La transmisión del control de los motores se envía mediante el tipo facilitado en el paquete MavROS \texttt{mavros\_msgs/PositionTarget}. Este mensaje transmite la información acerca de la posición para la coordenada ``x'', ``y'' y ``z'', la velocidad lineal en cada una de estos ejes de coordenadas, la aceleración en cada eje y la rotación entorno al eje ``y''. Con este mensaje se puede enviar toda la información para teleoperar un drone. Además este mensaje incluye una marca de tiempo para sincronizar el drone con el teleoperador. Como en los casos anteriores, esta definición se incluye en el método \texttt{connect} del objeto \texttt{API.MotorsRos} y se puede ver en el cuadro 4.29.
 
 \begin{lstlisting}[caption= Definición del mensaje para controlar los motores del drone, label=cod.mensajemotordrone]
 self.rosMotors = new ROSLIB.Topic({
@@ -679,7 +715,7 @@ self.rosMotors = new ROSLIB.Topic({
 });
 \end{lstlisting}
 
-Finalmente, los mensajes parta solicitar el arranque, despegue y aterrizaje se definen en el método \texttt{connect} del objeto \texttt{API.ExtraRos} y se muestran en el cuadro 4.26. El arranque se transmite mediante el mensaje del tipo \texttt{mavros\_msgs/CommandBool}, que envía únicamente un \textit{booleano} siendo el valor \textit{True} el que indica que arranque y \textit{False} el que indica que se apague el drone. Por otro lado, para el despegue y aterrizaje se utiliza el mismo tipo de mensaje contenido en el paquete de MavROS que es \texttt{mavros\_msgs/CommandTOL}. En este mensaje se envía información sobre la latitud, longitud, altitud y la rotación sobre el eje ``y''.
+Finalmente, los mensajes parta solicitar el arranque, despegue y aterrizaje se definen en el método \texttt{connect} del objeto \texttt{API.ExtraRos} y se muestran en el cuadro 4.30. El arranque se transmite mediante el mensaje del tipo \texttt{mavros\_msgs/CommandBool}, que envía únicamente un \textit{booleano} siendo el valor \textit{True} el que indica que arranque y \textit{False} el que indica que se apague el drone. Por otro lado, para el despegue y aterrizaje se utiliza el mismo tipo de mensaje contenido en el paquete de MavROS que es \texttt{mavros\_msgs/CommandTOL}. En este mensaje se envía información sobre la latitud, longitud, altitud y la rotación sobre el eje ``y''.
 
 \begin{lstlisting}[caption= {Definición de los mensajes para arrancar, despegar y aterrizar}, label=cod.mensajeextradrone]
 self.rosArming = new ROSLIB.Service({
@@ -705,7 +741,7 @@ self.rosLand = new ROSLIB.Service({
 
 Mediante los \textit{subscribe} de ROS se obtienen las imágenes de las cámaras, así como la odometría del drone en cada momento. Para ello, los objetos \texttt{API.CameraRos} y \texttt{API.Pose3DRos} cuentan con el método \texttt{startStreaming}, sobre el cual se realiza la subscripción al \textit{topic} y se tratan los mensajes recibidos. Dado que el funcionamiento es el mismo que el explicado en la sección 4.1.3.3 para el caso de las cámaras y en la sección 4.2.3.3.3 para la información odometrica, no se profundiza de nuevo.
 
-En la figura 4.20 se puede ver la representación del drone que se muestra en el visor.
+En la figura 4.21 se puede ver la representación del drone que se muestra en el visor.
 
 \begin{figure}[H]
   \begin{center}
@@ -719,7 +755,7 @@ En la figura 4.20 se puede ver la representación del drone que se muestra en el
 
 Para enviar la información acerca del control de los motores del drone, se utilizan los \textit{publisher} de ROS. Los motores se controlan mediante dos \textit{joysticks} que se proyectan sobre el elemento \texttt{canvas} donde se muestra la imagen recibida por la cámara, tal y como se ha indicado en la sección 4.3.2. El \textit{joystick} izquierdo maneja la velocidad lineal (adelante, atrás, izquierda y derecha), mientras que con el \textit{joystick} derecho se indica la altura del drone.
 
-Una vez se ha indicado esto, lo siguiente es crear el mensaje con la información de los motores y publicarlo. Para ello se ha definido el método \texttt{setMotors} dentro del objeto \texttt{API.MotorsRos} y que se muestra en el cuadro 4.27. Se va a utilizar el mensaje del tipo \texttt{mavros\_msgs/PositionTarget} proporcionado en el paquete MavROS.
+Una vez se ha indicado esto, lo siguiente es crear el mensaje con la información de los motores y publicarlo. Para ello se ha definido el método \texttt{setMotors} dentro del objeto \texttt{API.MotorsRos} y que se muestra en el cuadro 4.31. Se va a utilizar el mensaje del tipo \texttt{mavros\_msgs/PositionTarget} proporcionado en el paquete MavROS.
 
 \begin{lstlisting}[caption= Publicar el mensaje con la información del teleoperador, label=cod.publishetmotors]
 self.setMotors = function(vel){
@@ -762,15 +798,15 @@ self.setMotors = function(vel){
 }
 \end{lstlisting}
 
-Sobre el código del cuadro 4.27, la información del teleoperador se le introduce al método por parámetro. Dentro del método se crea la marca de tiempo para incorporarla a la cabecera del mensaje y se definen el resto de parámetros de la cabecera. Posteriormente se definen el resto de parámetros que forman parte del tipo de mensaje escogido, sin embargo para transmitir el control de los motores únicamente se utilizan los parámetros correspondientes a la velocidad en su componente ``x'' e ``y'' para transmitir la velocidad lineal, y la posición en su componente ``z'' para manejar la altura del drone. El resto de parámetros del mensaje no se utilizan por lo que se da el valor ``0''. Posteriormente se crea el mensaje que se va a transmitir mediante \texttt{new ROSLIB.Message} y se publica.
+Sobre el código del cuadro 4.31, la información del teleoperador se le introduce al método por parámetro. Dentro del método se crea la marca de tiempo para incorporarla a la cabecera del mensaje y se definen el resto de parámetros de la cabecera. Posteriormente se definen el resto de parámetros que forman parte del tipo de mensaje escogido, sin embargo para transmitir el control de los motores únicamente se utilizan los parámetros correspondientes a la velocidad en su componente ``x'' e ``y'' para transmitir la velocidad lineal, y la posición en su componente ``z'' para manejar la altura del drone. El resto de parámetros del mensaje no se utilizan por lo que se da el valor ``0''. Posteriormente se crea el mensaje que se va a transmitir mediante \texttt{new ROSLIB.Message} y se publica.
 
-Con este método se transmite un mensaje, pero se desea estar publicando mensajes con la información del teleoperador de manera continua. Al igual que se explica en la sección 4.2.3.4, se va a utilizar el método de HTML \texttt{setInterval} como se muestra en el cuadro 4.28.
+Con este método se transmite un mensaje, pero se desea estar publicando mensajes con la información del teleoperador de manera continua. Al igual que se explica en la sección 4.2.3.4, se va a utilizar el método de HTML \texttt{setInterval} como se muestra en el cuadro 4.32.
 
 \begin{lstlisting}[caption= Publicación continua del mensaje con la información del teleoperador, label=cod.intervalMotors]
 var cmdvelInterval = setInterval(function(){cmdvel.setMotors(cmdSend);},1);
 \end{lstlisting}
 
-En la figura 4.21 se muestra el visor de las cámaras y los \textit{joysticks} para controlar los motores.
+En la figura 4.22 se muestra el visor de las cámaras y los \textit{joysticks} para controlar los motores.
 
 \begin{figure}[H]
   \begin{center}
@@ -797,7 +833,7 @@ self.arming = function(arranque){
 }
 \end{lstlisting}
 
-En el código del cuadro 4.29 se muestra el método para realizar el arranque o apagado de los motores dependiendo lo que se envíe por parámetro al propio método. Si el valor del \textit{booleano} es verdadero, entonces se solicita el arranque mediante el servicio de ROS, si por el contrario es falso, se solicita su apagado. Para realizar la solicitud se utiliza el método de \texttt{roslibjs callService} y se le pasa por parámetro la petición creada mediante el objeto \texttt{new ROSLIB.ServiceRequest} y un manejador para el resultado. En caso de que el resultado sea positivo y se solicite el arranque, se llama al método que realiza la solicitud de despegue, si se trata del apagado de los motores no se realiza nada, ya que el drone queda a la espera de una nueva solicitud de arranque.
+En el código del cuadro 4.33 se muestra el método para realizar el arranque o apagado de los motores dependiendo lo que se envíe por parámetro al propio método. Si el valor del \textit{booleano} es verdadero, entonces se solicita el arranque mediante el servicio de ROS, si por el contrario es falso, se solicita su apagado. Para realizar la solicitud se utiliza el método de \texttt{roslibjs callService} y se le pasa por parámetro la petición creada mediante el objeto \texttt{new ROSLIB.ServiceRequest} y un manejador para el resultado. En caso de que el resultado sea positivo y se solicite el arranque, se llama al método que realiza la solicitud de despegue, si se trata del apagado de los motores no se realiza nada, ya que el drone queda a la espera de una nueva solicitud de arranque.
 
 \begin{lstlisting}[caption= Método para arrancar o apagar los motores del drone, label=cod.takeoff]
 self.takeoff = function(){
@@ -815,7 +851,7 @@ self.takeoff = function(){
 }
 \end{lstlisting}
 
-En el cuadro 4.30 se muestra el método para realizar el despegue. En la petición de despegue se debe enviar información acerca de la latitud, longitud, altitud, orientación entorno al eje ``y'' y el ángulo de vision. Dado que solo interesa indicar la altura, se dejan todos los valores a ``0'', menos la altitud que se fija un valor de ``5.5''. Posteriormente se vuelve a enviar la solicitud del mismo modo que para el arranque o apagado. En caso de que el resultado sea positivo, se llama al método para cambiar el modo de pilotaje del drone.
+En el cuadro 4.34 se muestra el método para realizar el despegue. En la petición de despegue se debe enviar información acerca de la latitud, longitud, altitud, orientación entorno al eje ``y'' y el ángulo de vision. Dado que solo interesa indicar la altura, se dejan todos los valores a ``0'', menos la altitud que se fija un valor de ``5.5''. Posteriormente se vuelve a enviar la solicitud del mismo modo que para el arranque o apagado. En caso de que el resultado sea positivo, se llama al método para cambiar el modo de pilotaje del drone.
 
 \begin{lstlisting}[caption= Método para cambiar el modo de pilotaje, label=cod.setMode]
 self.setmode = function(){
@@ -827,7 +863,7 @@ self.setmode = function(){
 }
 \end{lstlisting}
 
-En el cuadro 4.31 se muestra el método para cambiar el modo de pilotaje del drone. Una vez el drone ha despegado se le solicita que cambie el modo de piloto automático por el modo ``OFFBOARD'', de modo que se puedan controlar los motores mediante el teleoperador del visor. En este caso, una vez el resultado de la solicitud es afirmativo, no se realiza ninguna nueva acción al estar el drone ya listo para ser pilotado, por tanto el drone queda a la espera de la información con el control de los motores o la petición de aterrizaje.
+En el cuadro 4.35 se muestra el método para cambiar el modo de pilotaje del drone. Una vez el drone ha despegado se le solicita que cambie el modo de piloto automático por el modo ``OFFBOARD'', de modo que se puedan controlar los motores mediante el teleoperador del visor. En este caso, una vez el resultado de la solicitud es afirmativo, no se realiza ninguna nueva acción al estar el drone ya listo para ser pilotado, por tanto el drone queda a la espera de la información con el control de los motores o la petición de aterrizaje.
 
 \begin{lstlisting}[caption= Método para cambiar el modo de pilotaje, label=cod.setMode]
 this.land = function(){
@@ -844,7 +880,7 @@ this.land = function(){
 }
 \end{lstlisting}
 
-El cuadro 4.32 contiene el código del método que realiza la solicitud de aterrizaje. Se puede apreciar que la petición es igual a la realizada para indicar el despegue, salvo que la altitud que se envía ahora es ``0'' y no ``5.5'' como en el despegue. Una vez que se envía la solicitud de aterrizaje y el resultado es positivo, se llama al método del cuadro 4.29 pasando por parámetro el \textit{booleano false} para indicar que se solicita el apagado de los motores.
+El cuadro 4.36 contiene el código del método que realiza la solicitud de aterrizaje. Se puede apreciar que la petición es igual a la realizada para indicar el despegue, salvo que la altitud que se envía ahora es ``0'' y no ``5.5'' como en el despegue. Una vez que se envía la solicitud de aterrizaje y el resultado es positivo, se llama al método del cuadro 4.33 pasando por parámetro el \textit{booleano false} para indicar que se solicita el apagado de los motores.
 
 \subsection{Configuración}
 Al igual que los dos visores anteriores, se puede realizar la configuración mediante la utilización de un archivo del tipo ``YAML'' o a través de la configuración en tiempo de ejecución mediante el menú de configuración de la interfaz gráfica que se explica en la sección 4.3.2.
